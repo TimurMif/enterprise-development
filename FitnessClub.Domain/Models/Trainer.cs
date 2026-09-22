@@ -1,22 +1,22 @@
 namespace FitnessClub.Domain.Models;
 
 /// <summary>
-///     Представляет информацию о тренере
+/// Представляет информацию о тренере
 /// </summary>
 public class Trainer : Person
 {
     /// <summary>
-    ///     Идентификатор специализации тренера
+    /// Идентификатор специализации тренера
     /// </summary>
-    public Guid SpecializationId { get; set; }
+    public int SpecializationId { get; set; }
 
     /// <summary>
-    ///     Навигационное свойство специализации
+    /// Навигационное свойство специализации
     /// </summary>
     public required Specialization Specialization { get; set; }
 
     /// <summary>
-    ///     Стаж работы
+    /// Стаж работы
     /// </summary>
     public int ExperienceYears { get; set; }
 }

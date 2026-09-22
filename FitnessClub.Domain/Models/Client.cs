@@ -1,17 +1,17 @@
 namespace FitnessClub.Domain.Models;
 
 /// <summary>
-///     Представляет информацию о клиенте фитнес-клуба
+/// Представляет информацию о клиенте фитнес-клуба
 /// </summary>
 public class Client : Person
 {
     /// <summary>
-    ///     Дата начала абонемента
+    /// Дата начала абонемента
     /// </summary>
     public DateOnly SubscriptionStartDate { get; set; }
 
     /// <summary>
-    ///     Дата окончания абонемента
+    /// Дата окончания абонемента
     /// </summary>
     public DateOnly SubscriptionEndDate { get; set; }
 }

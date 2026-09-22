@@ -1,17 +1,17 @@
 namespace FitnessClub.Domain.Models;
 
 /// <summary>
-///     Справочник специализаций тренеров
+/// Справочник специализаций тренеров
 /// </summary>
 public class Specialization
 {
     /// <summary>
-    ///     Уникальный идентификатор
+    /// Уникальный идентификатор
     /// </summary>
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
     /// <summary>
-    ///     Название специализации
+    /// Название специализации
     /// </summary>
     public required string Name { get; set; }
 }

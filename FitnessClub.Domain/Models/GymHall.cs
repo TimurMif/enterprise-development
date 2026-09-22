@@ -1,22 +1,22 @@
 namespace FitnessClub.Domain.Models;
 
 /// <summary>
-///     Спортивный зал для проведения занятий
+/// Спортивный зал для проведения занятий
 /// </summary>
 public class GymHall
 {
     /// <summary>
-    ///     Уникальный идентификатор зала
+    /// Уникальный идентификатор зала
     /// </summary>
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
     /// <summary>
-    ///     Название зала
+    /// Название зала
     /// </summary>
     public required string Name { get; set; }
 
     /// <summary>
-    ///     Вместимость
+    /// Вместимость
     /// </summary>
     public int Capacity { get; set; }
 }
