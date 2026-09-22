@@ -4,12 +4,12 @@ using FitnessClub.Domain.Data;
 namespace FitnessClub.Tests.Fixtures;
 
 /// <summary>
-///     Общий контекст с данными фитнес-клуба для тестов
+/// Общий контекст с данными фитнес-клуба для тестов
 /// </summary>
 public class FitnessClubFixture
 {
     /// <summary>
-    ///     Запускает сидер при создании фикстуры
+    /// Запускает сидер при создании фикстуры
     /// </summary>
     public FitnessClubFixture()
     {
@@ -17,7 +17,7 @@ public class FitnessClubFixture
     }
 
     /// <summary>
-    ///     Контекст с тестовыми данными
+    /// Контекст с тестовыми данными
     /// </summary>
     public FitnessClubContext Context { get; }
 }
