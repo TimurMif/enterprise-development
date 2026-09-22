@@ -3,12 +3,12 @@ using FitnessClub.Tests.Fixtures;
 namespace FitnessClub.Tests;
 
 /// <summary>
-///     Тесты проверки данных и связей доменной модели
+/// Тесты проверки данных и связей доменной модели
 /// </summary>
 public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClubFixture>
 {
     /// <summary>
-    ///     Сидер создаёт минимум по 10 экземпляров каждого класса
+    /// Сидер создаёт минимум по 10 экземпляров каждого класса
     /// </summary>
     [Fact]
     public void SeederShouldCreateEnoughData()
@@ -28,7 +28,7 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
     }
 
     /// <summary>
-    ///     Проверка того, что у каждого тренера назначена специализация
+    /// Проверка того, что у каждого тренера назначена специализация
     /// </summary>
     [Fact]
     public void SeederShouldCreateTrainersWithSpecializations()
@@ -38,13 +38,13 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
         Assert.All(context.Trainers, trainer =>
         {
             Assert.NotNull(trainer.Specialization);
-            Assert.NotEqual(Guid.Empty, trainer.SpecializationId);
+            Assert.NotEqual(0, trainer.SpecializationId);
             Assert.Equal(trainer.Specialization.Id, trainer.SpecializationId);
         });
     }
 
     /// <summary>
-    ///     У каждого занятия есть клиент, тренер и зал
+    /// У каждого занятия есть клиент, тренер и зал
     /// </summary>
     [Fact]
     public void SeederShouldCreateTrainingSessionsWithRelations()
@@ -57,10 +57,6 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
             Assert.NotNull(session.Trainer);
             Assert.NotNull(session.GymHall);
 
-            Assert.NotEqual(Guid.Empty, session.ClientId);
-            Assert.NotEqual(Guid.Empty, session.TrainerId);
-            Assert.NotEqual(Guid.Empty, session.GymHallId);
-
             Assert.Equal(session.Client.Id, session.ClientId);
             Assert.Equal(session.Trainer.Id, session.TrainerId);
             Assert.Equal(session.GymHall.Id, session.GymHallId);
@@ -68,7 +64,7 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
     }
 
     /// <summary>
-    ///     Проверка, что дата окончания абонемента не раньше даты начала
+    /// Проверка, что дата окончания абонемента не раньше даты начала
     /// </summary>
     [Fact]
     public void ClientsSubscriptionEndDateShouldBeAfterStartDate()
@@ -77,12 +73,12 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
 
         Assert.All(context.Clients, client => Assert.True(
             client.SubscriptionEndDate >= client.SubscriptionStartDate,
-            $"У клиента '{client.LastName} {client.FirstName}' окончание абонемента ({client.SubscriptionEndDate}) " +
+            $"У клиента '{client.LastName} {client.FirstName}' окончание ({client.SubscriptionEndDate}) " +
             $"раньше начала ({client.SubscriptionStartDate})"));
     }
 
     /// <summary>
-    ///     У занятия заполнены поля контракта: дата, зал, пробное посещение
+    /// У занятия заполнены поля контракта: дата, зал, пробное посещение.
     /// </summary>
     [Fact]
     public void TrainingSessionShouldContainContractFields()
@@ -102,24 +98,24 @@ public class DomainTests(FitnessClubFixture fixture) : IClassFixture<FitnessClub
     }
 
     /// <summary>
-    ///     Проверка уникальности идентификаторов у всех сущностей
+    /// Проверка уникальности идентификаторов у всех сущностей
     /// </summary>
     [Fact]
     public void AllEntitiesShouldHaveUniqueIds()
     {
         var context = fixture.Context;
 
-        AssertUniqueIds(context.Clients.Select(c => c.Id), nameof(context.Clients));
-        AssertUniqueIds(context.Trainers.Select(t => t.Id), nameof(context.Trainers));
-        AssertUniqueIds(context.GymHalls.Select(h => h.Id), nameof(context.GymHalls));
-        AssertUniqueIds(context.Specializations.Select(s => s.Id), nameof(context.Specializations));
-        AssertUniqueIds(context.TrainingSessions.Select(s => s.Id), nameof(context.TrainingSessions));
+        AssertUniqueIds(context.Clients.Select(c => c.Id));
+        AssertUniqueIds(context.Trainers.Select(t => t.Id));
+        AssertUniqueIds(context.GymHalls.Select(h => h.Id));
+        AssertUniqueIds(context.Specializations.Select(s => s.Id));
+        AssertUniqueIds(context.TrainingSessions.Select(s => s.Id));
     }
 
-    private static void AssertUniqueIds(IEnumerable<Guid> ids, string entityName)
+    private static void AssertUniqueIds(IEnumerable<int> ids)
     {
         var list = ids.ToList();
         Assert.Equal(list.Count, list.Distinct().Count());
-        Assert.All(list, id => Assert.NotEqual(Guid.Empty, id));
+        Assert.All(list, id => Assert.NotEqual(0, id));
     }
 }

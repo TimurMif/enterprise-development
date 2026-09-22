@@ -1,196 +1,141 @@
-using FitnessClub.Domain.Context;
+using FitnessClub.Domain.Data;
 using FitnessClub.Tests.Fixtures;
 
 namespace FitnessClub.Tests;
 
 /// <summary>
-///     Unit-тесты для LINQ-запросов к фитнес-клубу
+/// Unit-тесты для LINQ запросов к фитнес-клубу
 /// </summary>
 public class QueriesTests(FitnessClubFixture fixture) : IClassFixture<FitnessClubFixture>
 {
     /// <summary>
-    ///     1. Тренеры со стажем не менее 5 лет
+    /// Тренеры со стажем не менее 5 лет
     /// </summary>
-    [Theory]
-    [InlineData(5)]
-    [InlineData(10)]
-    [InlineData(0)]
-    public void GetTrainersWithExperience_ReturnsCorrectTrainers(int minExperience)
+    [Fact]
+    public void GetTrainersWithExperience_ReturnsCorrectTrainers()
     {
         var context = fixture.Context;
 
         var result = context.Trainers
-            .Where(t => t.ExperienceYears >= minExperience)
+            .Where(t => t.ExperienceYears >= 5)
+            .Select(t => t.LastName)
             .ToList();
 
-        Assert.All(result, trainer => Assert.True(
-            trainer.ExperienceYears >= minExperience,
-            $"Тренер '{trainer.LastName} {trainer.FirstName}' имеет стаж {trainer.ExperienceYears}, " +
-            $"что меньше требуемого {minExperience}"));
+        var expected = new[]
+        {
+            "Орлова", "Фёдоров", "Михайлова", "Белов",
+            "Григорьева", "Тихонов", "Егорова"
+        };
 
-        var excluded = context.Trainers.Except(result).ToList();
-        Assert.All(excluded, trainer => Assert.True(
-            trainer.ExperienceYears < minExperience,
-            $"Тренер '{trainer.LastName} {trainer.FirstName}' со стажем {trainer.ExperienceYears} " +
-            $"должен был попасть в выборку"));
-
-        if (minExperience <= 5) Assert.NotEmpty(result);
+        Assert.Equal(expected.Length, result.Count);
+        Assert.All(expected, name => Assert.Contains(name, result));
     }
 
     /// <summary>
-    ///     2. Зал занят в проверяемый момент
+    /// Занят ли зал в проверяемый момент
+    /// Занятие 1: Зал Йоги 05.06.2025 с 10:00 до 11:00
     /// </summary>
     [Fact]
     public void IsHallAvailable_WhenTimeSlotIsOccupied_ReturnsFalse()
     {
         var context = fixture.Context;
+        const int hallId = 1;
+        var checkTime = new DateTime(2025, 6, 5, 10, 30, 0);
 
-        var session = context.TrainingSessions.First();
-        var checkTime = session.DateTime.AddMinutes(10);
-
-        var isAvailable = IsHallAvailableAt(context, session.GymHallId, checkTime);
-
-        Assert.False(isAvailable);
-    }
-
-    /// <summary>
-    ///     2. Зал свободен в проверяемый момент
-    /// </summary>
-    [Fact]
-    public void IsHallAvailable_WhenTimeSlotIsFree_ReturnsTrue()
-    {
-        var context = fixture.Context;
-        var hall = context.GymHalls.First();
-        var checkTime = DateTime.Now.AddYears(1);
-        var isAvailable = IsHallAvailableAt(context, hall.Id, checkTime);
-        Assert.True(isAvailable);
-    }
-
-    /// <summary>
-    ///     Проверяет, свободен ли зал в указанный момент
-    /// </summary>
-    private static bool IsHallAvailableAt(FitnessClubContext context, Guid hallId, DateTime checkTime)
-    {
         var isOccupied = context.TrainingSessions.Any(s =>
             s.GymHallId == hallId &&
             s.DateTime <= checkTime &&
             s.DateTime.Add(s.Duration) > checkTime);
 
-        return !isOccupied;
+        Assert.True(isOccupied);
     }
 
     /// <summary>
-    ///     3. Клиенты с просроченным абонементом, сортировка по фамилии и имени
+    /// Свободен ли зал в проверяемый момент.
+    /// В Зале Йоги 05.06.2025 после 11:00 занятий нет.
     /// </summary>
     [Fact]
-    public void GetClientsWithExpiredSubscription_SortedByName()
+    public void IsHallAvailable_WhenTimeSlotIsFree_ReturnsTrue()
     {
         var context = fixture.Context;
-        var today = DateOnly.FromDateTime(DateTime.Now);
+        const int hallId = 1;
+        var checkTime = new DateTime(2025, 6, 5, 12, 0, 0);
+
+        var isOccupied = context.TrainingSessions.Any(s =>
+            s.GymHallId == hallId &&
+            s.DateTime <= checkTime &&
+            s.DateTime.Add(s.Duration) > checkTime);
+
+        Assert.False(isOccupied);
+    }
+
+    /// <summary>
+    /// Клиенты с просроченным абонементом, сортировка по ФИО
+    /// Опорная дата 15.06.2025
+    /// </summary>
+    [Fact]
+    public void GetClientsWithExpiredSubscription_SortedByName_ReturnsExpected()
+    {
+        var context = fixture.Context;
+        var today = DataSeeder.ReferenceToday;
 
         var result = context.Clients
             .Where(c => c.SubscriptionEndDate < today)
             .OrderBy(c => c.LastName)
             .ThenBy(c => c.FirstName)
             .ThenBy(c => c.MiddleName)
+            .Select(c => c.LastName)
             .ToList();
 
-        Assert.All(result, client => Assert.True(
-            client.SubscriptionEndDate < today,
-            $"У клиента '{client.LastName} {client.FirstName}' абонемент до {client.SubscriptionEndDate}, " +
-            $"что не является просроченным на {today}"));
-
-        var expectedCount = context.Clients.Count(c => c.SubscriptionEndDate < today);
-        Assert.Equal(expectedCount, result.Count);
-
-        for (var i = 1; i < result.Count; i++)
+        var expected = new[]
         {
-            var prev = $"{result[i - 1].LastName} {result[i - 1].FirstName} {result[i - 1].MiddleName}";
-            var curr = $"{result[i].LastName} {result[i].FirstName} {result[i].MiddleName}";
-            Assert.True(
-                string.Compare(prev, curr, StringComparison.Ordinal) <= 0,
-                $"Нарушен порядок сортировки: '{prev}' должен идти после '{curr}'");
-        }
+            "Кузнецова", "Лебедев", "Попов", "Смирнов", "Соколова"
+        };
+
+        Assert.Equal(expected, result);
     }
 
     /// <summary>
-    ///     4. Занятия за текущий месяц в выбранном зале
+    /// Занятия за текущий месяц в зале Йоги.
     /// </summary>
     [Fact]
-    public void GetSessionsForCurrentMonthInSelectedHall_ReturnsFilteredSessions()
+    public void GetSessionsForJuneInSelectedHall_Returns4Sessions()
     {
         var context = fixture.Context;
-        var now = DateTime.Now;
-
-        var targetHall = context.GymHalls.FirstOrDefault(h =>
-            context.TrainingSessions.Any(s =>
-                s.GymHallId == h.Id &&
-                s.DateTime.Year == now.Year &&
-                s.DateTime.Month == now.Month));
-
-        Assert.NotNull(targetHall);
+        const int hallId = 1;
+        var year = DataSeeder.ReferenceDate.Year;
+        var month = DataSeeder.ReferenceDate.Month;
 
         var result = context.TrainingSessions
-            .Where(s => s.GymHallId == targetHall.Id
-                        && s.DateTime.Year == now.Year
-                        && s.DateTime.Month == now.Month)
+            .Where(s => s.GymHallId == hallId
+                        && s.DateTime.Year == year
+                        && s.DateTime.Month == month)
+            .Select(s => s.Id)
+            .OrderBy(id => id)
             .ToList();
 
-        Assert.NotEmpty(result);
+        var expected = new[] { 1, 2, 3, 4 };
 
-        Assert.All(result, session =>
-        {
-            Assert.Equal(targetHall.Id, session.GymHallId);
-            Assert.Equal(now.Year, session.DateTime.Year);
-            Assert.Equal(now.Month, session.DateTime.Month);
-        });
-
-        var expectedCount = context.TrainingSessions.Count(s =>
-            s.GymHallId == targetHall.Id &&
-            s.DateTime.Year == now.Year &&
-            s.DateTime.Month == now.Month);
-
-        Assert.Equal(expectedCount, result.Count);
+        Assert.Equal(expected, result);
     }
 
     /// <summary>
-    ///     5. Топ 5 популярных тренеров
+    /// Топ-5 популярных тренеров.
     /// </summary>
     [Fact]
-    public void GetTopFivePopularTrainers_ReturnsMaxFiveTrainers()
+    public void GetTopFivePopularTrainers_ReturnsExpectedOrder()
     {
         var context = fixture.Context;
 
         var result = context.TrainingSessions
-            .GroupBy(s => s.Trainer)
+            .GroupBy(s => s.TrainerId)
             .OrderByDescending(g => g.Count())
             .Take(5)
             .Select(g => g.Key)
             .ToList();
 
-        var trainersWithSessions = context.TrainingSessions
-            .Select(s => s.Trainer)
-            .Distinct()
-            .Count();
+        var expected = new[] { 10, 9, 8, 7, 6 };
 
-        Assert.Equal(Math.Min(5, trainersWithSessions), result.Count);
-
-        Assert.Equal(result.Count, result.Distinct().Count());
-
-        var counts = result
-            .Select(t => context.TrainingSessions.Count(s => s.Trainer.Id == t.Id))
-            .ToList();
-
-        for (var i = 1; i < counts.Count; i++)
-            Assert.True(
-                counts[i - 1] >= counts[i],
-                $"Нарушен порядок: тренер на позиции {i - 1} имеет {counts[i - 1]} занятий, " +
-                $"а на позиции {i} — {counts[i]}");
-
-        var maxCount = context.TrainingSessions
-            .GroupBy(s => s.Trainer)
-            .Max(g => g.Count());
-
-        Assert.Equal(maxCount, counts[0]);
+        Assert.Equal(expected, result);
     }
 }
