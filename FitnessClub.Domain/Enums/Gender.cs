@@ -1,17 +1,17 @@
 namespace FitnessClub.Domain.Enums;
 
 /// <summary>
-///     Пол человека
+/// Пол человека
 /// </summary>
 public enum Gender
 {
     /// <summary>
-    ///     Мужской
+    /// Мужской
     /// </summary>
     Male = 1,
 
     /// <summary>
-    ///     Женский
+    /// Женский
     /// </summary>
     Female = 2
 }
