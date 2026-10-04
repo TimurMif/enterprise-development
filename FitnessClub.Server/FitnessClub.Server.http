@@ -1,0 +1,41 @@
+@host = http://localhost:5268
+
+### Получить всех клиентов
+GET {{host}}/api/Clients
+Accept: application/json
+
+### Получить клиента по Id
+GET {{host}}/api/Clients/1
+Accept: application/json
+
+### Получить всех тренеров
+GET {{host}}/api/Trainers
+Accept: application/json
+
+### Получить все сессии тренировок
+GET {{host}}/api/TrainingSessions
+Accept: application/json
+
+### Тренеры со стажем не менее 5 лет
+GET {{host}}/api/Analytics/experienced-trainers
+Accept: application/json
+
+### Проверка доступности зала 1 в момент 05.06.2025 10:30
+GET {{host}}/api/Analytics/hall-availability?hallId=1&checkTime=2025-06-05T10:30:00
+Accept: application/json
+
+### Проверка доступности зала 1 в момент 05.06.2025 12:00
+GET {{host}}/api/Analytics/hall-availability?hallId=1&checkTime=2025-06-05T12:00:00
+Accept: application/json
+
+### Клиенты с просроченным абонементом на 15.06.2025
+GET {{host}}/api/Analytics/expired-subscriptions?date=2025-06-15
+Accept: application/json
+
+### Занятия за июнь 2025 года в зале 1
+GET {{host}}/api/Analytics/sessions-by-hall-month?hallId=1&year=2025&month=6
+Accept: application/json
+
+### Топ-5 популярных тренеров
+GET {{host}}/api/Analytics/top-5-trainers
+Accept: application/json
