@@ -1,5 +1,6 @@
+using FitnessClub.Application.Services;
+using FitnessClub.Contracts.Interfaces;
 using FitnessClub.Domain.Data;
-using FitnessClub.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
