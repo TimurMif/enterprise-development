@@ -1,5 +1,5 @@
-using FitnessClub.Domain.Models;
-using FitnessClub.Server.Services;
+using FitnessClub.Contracts.Dto;
+using FitnessClub.Contracts.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessClub.Server.Controllers;
@@ -12,61 +12,141 @@ namespace FitnessClub.Server.Controllers;
 public class ClientsController : ControllerBase
 {
     private readonly IClientService _clientService;
+    private readonly ILogger<ClientsController> _logger;
 
-    public ClientsController(IClientService clientService)
+    public ClientsController(IClientService clientService, ILogger<ClientsController> logger)
     {
         _clientService = clientService;
+        _logger = logger;
     }
 
     /// <summary>
     /// Список всех клиентов
     /// </summary>
     [HttpGet]
-    public ActionResult<List<Client>> GetAll()
+    [ProducesResponseType(typeof(List<ClientDto>), 200)]
+    [ProducesResponseType(500)]
+    public async Task<ActionResult<List<ClientDto>>> GetAll()
     {
-        return Ok(_clientService.GetAll());
+        _logger.LogInformation("Запрос на получение списка всех клиентов.");
+        try
+        {
+            var result = await _clientService.GetAllAsync();
+            _logger.LogInformation("Успешно получено клиентов: {Count}.", result.Count);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении списка клиентов[cite: 51].");
+            return StatusCode(500, "Внутренняя ошибка сервера");
+        }
     }
 
     /// <summary>
     /// Информация о клиенте по его Id
     /// </summary>
     [HttpGet("{id:int}")]
-    public ActionResult<Client> GetById(int id)
+    [ProducesResponseType(typeof(ClientDto), 200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    public async Task<ActionResult<ClientDto>> GetById(int id)
     {
-        var client = _clientService.GetById(id);
-        if (client == null) return NotFound();
-        return Ok(client);
+        _logger.LogInformation("Запрос информации о клиенте с ID {Id}.", id);
+        try
+        {
+            var client = await _clientService.GetByIdAsync(id);
+            if (client == null)
+            {
+                _logger.LogWarning("Клиент с ID {Id} не найден.", id);
+                return NotFound();
+            }
+            _logger.LogInformation("Успешно получен клиент с ID {Id}.", id);
+            return Ok(client);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при получении клиента с ID {Id}[cite: 51].", id);
+            return StatusCode(500, "Внутренняя ошибка сервера");
+        }
     }
 
     /// <summary>
     /// Создает новую запись клиента
     /// </summary>
     [HttpPost]
-    public ActionResult<Client> Create([FromBody] Client client)
+    [ProducesResponseType(typeof(ClientDto), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(500)]
+    public async Task<ActionResult<ClientDto>> Create([FromBody] ClientEditDto clientDto)
     {
-        var createdClient = _clientService.Create(client);
-        return CreatedAtAction(nameof(GetById), new { id = createdClient.Id }, createdClient);
+        _logger.LogInformation("Попытка создания нового клиента с паспортом {Passport}.", clientDto.PassportNumber);
+        try
+        {
+            var createdClient = await _clientService.CreateAsync(clientDto);
+            _logger.LogInformation("Успешно создан клиент с ID {Id}.", createdClient.Id);
+            return CreatedAtAction(nameof(GetById), new { id = createdClient.Id }, createdClient);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при создании клиента[cite: 51].");
+            return StatusCode(500, "Внутренняя ошибка сервера");
+        }
     }
 
     /// <summary>
     /// Обновляет данные существующего клиента по его Id
     /// </summary>
     [HttpPut("{id:int}")]
-    public IActionResult Update(int id, [FromBody] Client client)
+    [ProducesResponseType(204)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> Update(int id, [FromBody] ClientEditDto clientDto)
     {
-        var success = _clientService.Update(id, client);
-        if (!success) return NotFound();
-        return NoContent();
+        _logger.LogInformation("Попытка обновления клиента с ID {Id}.", id);
+        try
+        {
+            var success = await _clientService.UpdateAsync(id, clientDto);
+            if (!success)
+            {
+                _logger.LogWarning("Клиент с ID {Id} не найден для обновления.", id);
+                return NotFound();
+            }
+            _logger.LogInformation("Успешно обновлен клиент с ID {Id}.", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при обновлении клиента с ID {Id}[cite: 51].", id);
+            return StatusCode(500, "Внутренняя ошибка сервера");
+        }
     }
 
     /// <summary>
     /// Удаляет клиента по его Id
     /// </summary>
     [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id)
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> Delete(int id)
     {
-        var success = _clientService.Delete(id);
-        if (!success) return NotFound();
-        return NoContent();
+        _logger.LogInformation("Попытка удаления клиента с ID {Id}.", id);
+        try
+        {
+            var success = await _clientService.DeleteAsync(id);
+            if (!success)
+            {
+                _logger.LogWarning("Клиент с ID {Id} не найден для удаления.", id);
+                return NotFound();
+            }
+            _logger.LogInformation("Успешно удален клиент с ID {Id}.", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при удалении клиента с ID {Id}[cite: 51].", id);
+            return StatusCode(500, "Внутренняя ошибка сервера");
+        }
     }
 }
