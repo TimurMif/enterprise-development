@@ -1,49 +1,89 @@
 using FitnessClub.Contracts.Dto;
 using FitnessClub.Contracts.Interfaces;
-using FitnessClub.Domain.Context;
+using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
+using FitnessClub.Application.Mapping;
 
 namespace FitnessClub.Application.Services;
 
+/// <summary>
+/// Сервис для работы с тренерами фитнес-клуба
+/// </summary>
 public class TrainerService : ITrainerService
 {
-    private readonly FitnessClubContext _context;
+    private readonly IRepository<Trainer> _trainerRepository;
+    private readonly IRepository<Specialization> _specializationRepository;
 
-    public TrainerService(FitnessClubContext context)
+    /// <summary>
+    /// Инициализирует новый экземпляр сервиса тренеров
+    /// </summary>
+    public TrainerService(
+        IRepository<Trainer> trainerRepository,
+        IRepository<Specialization> specializationRepository)
     {
-        _context = context;
+        _trainerRepository = trainerRepository;
+        _specializationRepository = specializationRepository;
     }
 
     /// <summary>
     /// Возвращает список всех тренеров фитнес-клуба
     /// </summary>
-    public Task<List<TrainerDto>> GetAllAsync()
+    public async Task<List<TrainerDto>> GetAllAsync()
     {
-        var dtos = _context.Trainers.Select(MapToDto).ToList();
-        return Task.FromResult(dtos);
+        var trainers = await _trainerRepository.GetAllAsync();
+        return trainers.Select(t => t.ToDto()).ToList();
     }
 
     /// <summary>
     /// Возвращает информацию о тренере по его Id
     /// </summary>
-    public Task<TrainerDto?> GetByIdAsync(int id)
+    public async Task<TrainerDto?> GetByIdAsync(int id)
     {
-        var trainer = _context.Trainers.FirstOrDefault(t => t.Id == id);
-        return Task.FromResult(trainer == null ? null : MapToDto(trainer));
+        var trainer = await _trainerRepository.GetByIdAsync(id);
+        return trainer == null ? null : trainer.ToDto();
     }
 
     /// <summary>
     /// Создает новую запись тренера на основе переданных данных
     /// </summary>
-    public Task<TrainerDto?> CreateAsync(TrainerEditDto dto)
+    public async Task<TrainerDto?> CreateAsync(TrainerEditDto dto)
     {
-        var spec = _context.Specializations.FirstOrDefault(s => s.Id == dto.SpecializationId);
-        if (spec == null) return Task.FromResult<TrainerDto?>(null);
+        var spec = await _specializationRepository.GetByIdAsync(dto.SpecializationId);
+        if (spec == null) return null;
 
-        var newId = _context.Trainers.Any() ? _context.Trainers.Max(t => t.Id) + 1 : 1;
-        var trainer = new Trainer
+        var created = await _trainerRepository.AddAsync(MapToEntity(dto, spec));
+        return created.ToDto();
+    }
+
+    /// <summary>
+    /// Обновляет данные существующего тренера по его Id
+    /// </summary>
+    public async Task<bool> UpdateAsync(int id, TrainerEditDto updatedDto)
+    {
+        var spec = await _specializationRepository.GetByIdAsync(updatedDto.SpecializationId);
+        if (spec == null) return false;
+
+        var trainer = MapToEntity(updatedDto, spec);
+        trainer.Id = id;
+
+        return await _trainerRepository.UpdateAsync(trainer);
+    }
+
+    /// <summary>
+    /// Удаляет тренера по его Id вместе с сопутствующими сессиями
+    /// </summary>
+    public Task<bool> DeleteAsync(int id)
+    {
+        return _trainerRepository.DeleteAsync(id);
+    }
+
+    /// <summary>
+    /// Преобразует DTO в доменную модель тренера
+    /// </summary>
+    private static Trainer MapToEntity(TrainerEditDto dto, Specialization spec)
+    {
+        return new Trainer
         {
-            Id = newId,
             PassportNumber = dto.PassportNumber,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
@@ -54,72 +94,6 @@ public class TrainerService : ITrainerService
             ExperienceYears = dto.ExperienceYears,
             SpecializationId = spec.Id,
             Specialization = spec
-        };
-
-        _context.Trainers.Add(trainer);
-        return Task.FromResult<TrainerDto?>(MapToDto(trainer));
-    }
-
-    /// <summary>
-    /// Обновляет данные существующего тренера по его Id
-    /// </summary>
-    public Task<bool> UpdateAsync(int id, TrainerEditDto updatedDto)
-    {
-        var trainer = _context.Trainers.FirstOrDefault(t => t.Id == id);
-        if (trainer == null) return Task.FromResult(false);
-
-        var spec = _context.Specializations.FirstOrDefault(s => s.Id == updatedDto.SpecializationId);
-        if (spec == null) return Task.FromResult(false);
-
-        trainer.PassportNumber = updatedDto.PassportNumber;
-        trainer.FirstName = updatedDto.FirstName;
-        trainer.LastName = updatedDto.LastName;
-        trainer.MiddleName = updatedDto.MiddleName;
-        trainer.Gender = updatedDto.Gender;
-        trainer.DateOfBirth = updatedDto.DateOfBirth;
-        trainer.PhoneNumber = updatedDto.PhoneNumber;
-        trainer.ExperienceYears = updatedDto.ExperienceYears;
-        trainer.SpecializationId = updatedDto.SpecializationId;
-        trainer.Specialization = spec;
-
-        return Task.FromResult(true);
-    }
-
-    /// <summary>
-    /// Удаляет тренера по его Id вместе с сопутствующими сессиями
-    /// </summary>
-    public Task<bool> DeleteAsync(int id)
-    {
-        var trainer = _context.Trainers.FirstOrDefault(t => t.Id == id);
-        if (trainer == null) return Task.FromResult(false);
-
-        _context.TrainingSessions.RemoveAll(s => s.TrainerId == id);
-        _context.Trainers.Remove(trainer);
-        return Task.FromResult(true);
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель тренера в объект передачи данных DTO
-    /// </summary>
-    private static TrainerDto MapToDto(Trainer t)
-    {
-        return new TrainerDto
-        {
-            Id = t.Id,
-            PassportNumber = t.PassportNumber,
-            FirstName = t.FirstName,
-            LastName = t.LastName,
-            MiddleName = t.MiddleName,
-            Gender = t.Gender,
-            DateOfBirth = t.DateOfBirth,
-            PhoneNumber = t.PhoneNumber,
-            ExperienceYears = t.ExperienceYears,
-            SpecializationId = t.SpecializationId,
-            Specialization = new SpecializationDto
-            {
-                Id = t.Specialization.Id,
-                Name = t.Specialization.Name
-            }
         };
     }
 }

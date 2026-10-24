@@ -1,52 +1,99 @@
 using FitnessClub.Contracts.Dto;
 using FitnessClub.Contracts.Interfaces;
-using FitnessClub.Domain.Context;
+using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
+using FitnessClub.Application.Mapping;
 
 namespace FitnessClub.Application.Services;
 
+/// <summary>
+/// Сервис для работы с тренировочными сессиями фитнес-клуба
+/// </summary>
 public class TrainingSessionService : ITrainingSessionService
 {
-    private readonly FitnessClubContext _context;
+    private readonly IRepository<TrainingSession> _sessionRepository;
+    private readonly IRepository<Client> _clientRepository;
+    private readonly IRepository<Trainer> _trainerRepository;
+    private readonly IRepository<GymHall> _gymHallRepository;
 
-    public TrainingSessionService(FitnessClubContext context)
+    /// <summary>
+    /// Инициализирует новый экземпляр сервиса тренировочных сессий
+    /// </summary>
+    public TrainingSessionService(
+        IRepository<TrainingSession> sessionRepository,
+        IRepository<Client> clientRepository,
+        IRepository<Trainer> trainerRepository,
+        IRepository<GymHall> gymHallRepository)
     {
-        _context = context;
+        _sessionRepository = sessionRepository;
+        _clientRepository = clientRepository;
+        _trainerRepository = trainerRepository;
+        _gymHallRepository = gymHallRepository;
     }
 
     /// <summary>
     /// Возвращает список всех тренировочных сессий
     /// </summary>
-    public Task<List<TrainingSessionDto>> GetAllAsync()
+    public async Task<List<TrainingSessionDto>> GetAllAsync()
     {
-        var dtos = _context.TrainingSessions.Select(MapToDto).ToList();
-        return Task.FromResult(dtos);
+        var sessions = await _sessionRepository.GetAllAsync();
+        return sessions.Select(s => s.ToDto()).ToList();
     }
 
     /// <summary>
     /// Возвращает информацию о тренировке по ее Id
     /// </summary>
-    public Task<TrainingSessionDto?> GetByIdAsync(int id)
+    public async Task<TrainingSessionDto?> GetByIdAsync(int id)
     {
-        var session = _context.TrainingSessions.FirstOrDefault(s => s.Id == id);
-        return Task.FromResult(session == null ? null : MapToDto(session));
+        var session = await _sessionRepository.GetByIdAsync(id);
+        return session == null ? null : session.ToDto();
     }
 
     /// <summary>
-    /// Создает новую тренировочную сессию на основе переданных данных
+    /// Создает новую тренировочную сессию
     /// </summary>
-    public Task<TrainingSessionDto?> CreateAsync(TrainingSessionEditDto dto)
+    public async Task<TrainingSessionDto?> CreateAsync(TrainingSessionEditDto dto)
     {
-        var client = _context.Clients.FirstOrDefault(c => c.Id == dto.ClientId);
-        var trainer = _context.Trainers.FirstOrDefault(t => t.Id == dto.TrainerId);
-        var gymHall = _context.GymHalls.FirstOrDefault(h => h.Id == dto.GymHallId);
+        var session = await BuildSessionAsync(dto);
+        if (session == null) return null;
 
-        if (client == null || trainer == null || gymHall == null) return Task.FromResult<TrainingSessionDto?>(null);
+        var created = await _sessionRepository.AddAsync(session);
+        return created.ToDto();
+    }
 
-        var newId = _context.TrainingSessions.Any() ? _context.TrainingSessions.Max(s => s.Id) + 1 : 1;
-        var session = new TrainingSession
+    /// <summary>
+    /// Обновляет данные существующей тренировки по ее Id
+    /// </summary>
+    public async Task<bool> UpdateAsync(int id, TrainingSessionEditDto updatedDto)
+    {
+        var session = await BuildSessionAsync(updatedDto);
+        if (session == null) return false;
+
+        session.Id = id;
+        return await _sessionRepository.UpdateAsync(session);
+    }
+
+    /// <summary>
+    /// Удаляет тренировочную сессию по ее Id
+    /// </summary>
+    public Task<bool> DeleteAsync(int id)
+    {
+        return _sessionRepository.DeleteAsync(id);
+    }
+
+    /// <summary>
+    /// Собирает доменную модель сессии, находя клиента, тренера и зал по Id.
+    /// </summary>
+    private async Task<TrainingSession?> BuildSessionAsync(TrainingSessionEditDto dto)
+    {
+        var client = await _clientRepository.GetByIdAsync(dto.ClientId);
+        var trainer = await _trainerRepository.GetByIdAsync(dto.TrainerId);
+        var gymHall = await _gymHallRepository.GetByIdAsync(dto.GymHallId);
+
+        if (client == null || trainer == null || gymHall == null) return null;
+
+        return new TrainingSession
         {
-            Id = newId,
             ClientId = client.Id,
             Client = client,
             TrainerId = trainer.Id,
@@ -56,102 +103,6 @@ public class TrainingSessionService : ITrainingSessionService
             DateTime = dto.DateTime,
             Duration = dto.Duration,
             IsTrial = dto.IsTrial
-        };
-
-        _context.TrainingSessions.Add(session);
-        return Task.FromResult<TrainingSessionDto?>(MapToDto(session));
-    }
-
-    /// <summary>
-    /// Обновляет данные существующей тренировки по ее Id
-    /// </summary>
-    public Task<bool> UpdateAsync(int id, TrainingSessionEditDto updatedDto)
-    {
-        var session = _context.TrainingSessions.FirstOrDefault(s => s.Id == id);
-        if (session == null) return Task.FromResult(false);
-
-        var client = _context.Clients.FirstOrDefault(c => c.Id == updatedDto.ClientId);
-        var trainer = _context.Trainers.FirstOrDefault(t => t.Id == updatedDto.TrainerId);
-        var gymHall = _context.GymHalls.FirstOrDefault(h => h.Id == updatedDto.GymHallId);
-
-        if (client == null || trainer == null || gymHall == null) return Task.FromResult(false);
-
-        session.ClientId = updatedDto.ClientId;
-        session.Client = client;
-        session.TrainerId = updatedDto.TrainerId;
-        session.Trainer = trainer;
-        session.GymHallId = updatedDto.GymHallId;
-        session.GymHall = gymHall;
-        session.DateTime = updatedDto.DateTime;
-        session.Duration = updatedDto.Duration;
-        session.IsTrial = updatedDto.IsTrial;
-
-        return Task.FromResult(true);
-    }
-
-    /// <summary>
-    /// Удаляет тренировочную сессию по ее Id
-    /// </summary>
-    public Task<bool> DeleteAsync(int id)
-    {
-        var session = _context.TrainingSessions.FirstOrDefault(s => s.Id == id);
-        if (session == null) return Task.FromResult(false);
-
-        _context.TrainingSessions.Remove(session);
-        return Task.FromResult(true);
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель тренировки в объект передачи данных DTO
-    /// </summary>
-    private static TrainingSessionDto MapToDto(TrainingSession s)
-    {
-        return new TrainingSessionDto
-        {
-            Id = s.Id,
-            ClientId = s.ClientId,
-            Client = new ClientDto
-            {
-                Id = s.Client.Id,
-                PassportNumber = s.Client.PassportNumber,
-                FirstName = s.Client.FirstName,
-                LastName = s.Client.LastName,
-                MiddleName = s.Client.MiddleName,
-                Gender = s.Client.Gender,
-                DateOfBirth = s.Client.DateOfBirth,
-                PhoneNumber = s.Client.PhoneNumber,
-                SubscriptionStartDate = s.Client.SubscriptionStartDate,
-                SubscriptionEndDate = s.Client.SubscriptionEndDate
-            },
-            TrainerId = s.TrainerId,
-            Trainer = new TrainerDto
-            {
-                Id = s.Trainer.Id,
-                PassportNumber = s.Trainer.PassportNumber,
-                FirstName = s.Trainer.FirstName,
-                LastName = s.Trainer.LastName,
-                MiddleName = s.Trainer.MiddleName,
-                Gender = s.Trainer.Gender,
-                DateOfBirth = s.Trainer.DateOfBirth,
-                PhoneNumber = s.Trainer.PhoneNumber,
-                ExperienceYears = s.Trainer.ExperienceYears,
-                SpecializationId = s.Trainer.SpecializationId,
-                Specialization = new SpecializationDto
-                {
-                    Id = s.Trainer.Specialization.Id,
-                    Name = s.Trainer.Specialization.Name
-                }
-            },
-            GymHallId = s.GymHallId,
-            GymHall = new GymHallDto
-            {
-                Id = s.GymHall.Id,
-                Name = s.GymHall.Name,
-                Capacity = s.GymHall.Capacity
-            },
-            DateTime = s.DateTime,
-            Duration = s.Duration,
-            IsTrial = s.IsTrial
         };
     }
 }

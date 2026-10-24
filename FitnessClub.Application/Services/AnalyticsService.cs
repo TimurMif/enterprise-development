@@ -1,154 +1,118 @@
+using FitnessClub.Application.Mapping;
 using FitnessClub.Contracts.Dto;
 using FitnessClub.Contracts.Interfaces;
-using FitnessClub.Domain.Context;
+using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
 
 namespace FitnessClub.Application.Services;
 
+/// <summary>
+/// Сервис аналитических запросов по данным фитнес-клуба
+/// </summary>
 public class AnalyticsService : IAnalyticsService
 {
-    private readonly FitnessClubContext _context;
+    private readonly IRepository<Trainer> _trainerRepository;
+    private readonly IRepository<Client> _clientRepository;
+    private readonly IRepository<TrainingSession> _sessionRepository;
 
-    public AnalyticsService(FitnessClubContext context)
+    /// <summary>
+    /// Инициализирует новый экземпляр сервиса аналитики
+    /// </summary>
+    public AnalyticsService(
+        IRepository<Trainer> trainerRepository,
+        IRepository<Client> clientRepository,
+        IRepository<TrainingSession> sessionRepository)
     {
-        _context = context;
+        _trainerRepository = trainerRepository;
+        _clientRepository = clientRepository;
+        _sessionRepository = sessionRepository;
     }
 
     /// <summary>
     /// Возвращает список тренеров со стажем не менее 5 лет
     /// </summary>
-    public Task<List<TrainerDto>> GetTrainersWithAtLeast5YearsExperienceAsync()
+    public async Task<List<TrainerDto>> GetTrainersWithAtLeast5YearsExperienceAsync()
     {
-        var result = _context.Trainers
+        var trainers = await _trainerRepository.GetAllAsync();
+
+        var result = trainers
             .Where(t => t.ExperienceYears >= 5)
-            .Select(MapToTrainerDto)
+            .Select(t => t.ToDto())
             .ToList();
-        return Task.FromResult(result);
+        return result;
     }
 
     /// <summary>
     /// Проверяет доступность указанного зала в заданное время
     /// </summary>
-    public Task<bool> IsHallAvailableAsync(int hallId, DateTime checkTime)
+    public async Task<bool> IsHallAvailableAsync(int hallId, DateTime checkTime)
     {
-        var isOccupied = _context.TrainingSessions.Any(s =>
+        var sessions = await _sessionRepository.GetAllAsync();
+
+        var isOccupied = sessions.Any(s =>
             s.GymHallId == hallId &&
             s.DateTime <= checkTime &&
             s.DateTime.Add(s.Duration) > checkTime);
 
-        return Task.FromResult(!isOccupied);
+        return !isOccupied;
     }
 
     /// <summary>
     /// Возвращает список клиентов с просроченными абонементами на указанную дату
     /// </summary>
-    public Task<List<ClientDto>> GetClientsWithExpiredSubscriptionAsync(DateOnly referenceDate)
+    public async Task<List<ClientDto>> GetClientsWithExpiredSubscriptionAsync(DateOnly referenceDate)
     {
-        var result = _context.Clients
+        var clients = await _clientRepository.GetAllAsync();
+
+        var result = clients
             .Where(c => c.SubscriptionEndDate < referenceDate)
             .OrderBy(c => c.LastName)
             .ThenBy(c => c.FirstName)
             .ThenBy(c => c.MiddleName)
-            .Select(MapToClientDto)
+            .Select(c => c.ToDto())
             .ToList();
 
-        return Task.FromResult(result);
+        return result;
     }
 
     /// <summary>
-    /// Возвращает список тренировок в указанном зале за определенное время
+    /// Возвращает список тренировок в указанном зале за определенный месяц и год
     /// </summary>
-    public Task<List<TrainingSessionDto>> GetSessionsForMonthInHallAsync(int hallId, int year, int month)
+    public async Task<List<TrainingSessionDto>> GetSessionsForMonthInHallAsync(int hallId, int year, int month)
     {
-        var result = _context.TrainingSessions
+        var sessions = await _sessionRepository.GetAllAsync();
+
+        var result = sessions
             .Where(s => s.GymHallId == hallId
                         && s.DateTime.Year == year
                         && s.DateTime.Month == month)
-            .Select(MapToSessionDto)
+            .Select(s => s.ToDto())
             .ToList();
 
-        return Task.FromResult(result);
+        return result;
     }
 
     /// <summary>
     /// Возвращает список топ-5 самых популярных тренеров
     /// </summary>
-    public Task<List<TrainerDto>> GetTop5TrainersAsync()
+    public async Task<List<TrainerDto>> GetTop5TrainersAsync()
     {
-        var topTrainerIds = _context.TrainingSessions
+        var sessions = await _sessionRepository.GetAllAsync();
+        var allTrainers = await _trainerRepository.GetAllAsync();
+
+        var topTrainerIds = sessions
             .GroupBy(s => s.TrainerId)
             .OrderByDescending(g => g.Count())
             .Select(g => g.Key)
             .ToList();
 
         var trainers = topTrainerIds
-            .Select(id => _context.Trainers.FirstOrDefault(t => t.Id == id))
+            .Select(id => allTrainers.FirstOrDefault(t => t.Id == id))
             .OfType<Trainer>()
             .Take(5)
-            .Select(MapToTrainerDto)
+            .Select(t => t.ToDto())
             .ToList();
 
-        return Task.FromResult(trainers);
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель тренера в объект передачи данных DTO
-    /// </summary>
-    private static TrainerDto MapToTrainerDto(Trainer t)
-    {
-        return new TrainerDto
-        {
-            Id = t.Id,
-            PassportNumber = t.PassportNumber,
-            FirstName = t.FirstName,
-            LastName = t.LastName,
-            MiddleName = t.MiddleName,
-            Gender = t.Gender,
-            DateOfBirth = t.DateOfBirth,
-            PhoneNumber = t.PhoneNumber,
-            ExperienceYears = t.ExperienceYears,
-            SpecializationId = t.SpecializationId,
-            Specialization = new SpecializationDto { Id = t.Specialization.Id, Name = t.Specialization.Name }
-        };
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель клиента в объект передачи данных DTO
-    /// </summary>
-    private static ClientDto MapToClientDto(Client c)
-    {
-        return new ClientDto
-        {
-            Id = c.Id,
-            PassportNumber = c.PassportNumber,
-            FirstName = c.FirstName,
-            LastName = c.LastName,
-            MiddleName = c.MiddleName,
-            Gender = c.Gender,
-            DateOfBirth = c.DateOfBirth,
-            PhoneNumber = c.PhoneNumber,
-            SubscriptionStartDate = c.SubscriptionStartDate,
-            SubscriptionEndDate = c.SubscriptionEndDate
-        };
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель тренировки в объект передачи данных DTO
-    /// </summary>
-    private static TrainingSessionDto MapToSessionDto(TrainingSession s)
-    {
-        return new TrainingSessionDto
-        {
-            Id = s.Id,
-            ClientId = s.ClientId,
-            Client = MapToClientDto(s.Client),
-            TrainerId = s.TrainerId,
-            Trainer = MapToTrainerDto(s.Trainer),
-            GymHallId = s.GymHallId,
-            GymHall = new GymHallDto { Id = s.GymHall.Id, Name = s.GymHall.Name, Capacity = s.GymHall.Capacity },
-            DateTime = s.DateTime,
-            Duration = s.Duration,
-            IsTrial = s.IsTrial
-        };
+        return trainers;
     }
 }
