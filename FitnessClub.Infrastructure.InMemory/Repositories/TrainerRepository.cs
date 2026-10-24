@@ -21,7 +21,7 @@ public class TrainerRepository : IRepository<Trainer>
     /// </summary>
     public Task<List<Trainer>> GetAllAsync()
     {
-        return Task.FromResult(_context.Trainers);
+        return Task.FromResult(_context.Trainers.ToList());
     }
 
     /// <summary>
@@ -35,16 +35,18 @@ public class TrainerRepository : IRepository<Trainer>
     /// <summary>
     /// Добавляет нового тренера
     /// </summary>
-    public Task AddAsync(Trainer entity)
+    public Task<Trainer> AddAsync(Trainer entity)
     {
+        entity.Id = _context.Trainers.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
         _context.Trainers.Add(entity);
-        return Task.CompletedTask;
+
+        return Task.FromResult(entity);
     }
 
     /// <summary>
     /// Обновляет данные существующего тренера
     /// </summary>
-    public Task<bool> Update(Trainer entity)
+    public Task<bool> UpdateAsync(Trainer entity)
     {
         var existing = _context.Trainers.FirstOrDefault(t => t.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
@@ -66,7 +68,7 @@ public class TrainerRepository : IRepository<Trainer>
     /// <summary>
     /// Удаляет тренера по его Id
     /// </summary>
-    public Task<bool> Delete(int id)
+    public Task<bool> DeleteAsync(int id)
     {
         var entity = _context.Trainers.FirstOrDefault(t => t.Id == id);
         if (entity == null) return Task.FromResult(false);

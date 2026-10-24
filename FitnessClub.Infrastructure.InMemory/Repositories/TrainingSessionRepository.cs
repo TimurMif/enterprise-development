@@ -21,7 +21,7 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// </summary>
     public Task<List<TrainingSession>> GetAllAsync()
     {
-        return Task.FromResult(_context.TrainingSessions);
+        return Task.FromResult(_context.TrainingSessions.ToList());
     }
 
     /// <summary>
@@ -35,16 +35,18 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// <summary>
     /// Добавляет новую тренировочную сессию
     /// </summary>
-    public Task AddAsync(TrainingSession entity)
+    public Task<TrainingSession> AddAsync(TrainingSession entity)
     {
+        entity.Id = _context.TrainingSessions.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
         _context.TrainingSessions.Add(entity);
-        return Task.CompletedTask;
+
+        return Task.FromResult(entity);
     }
 
     /// <summary>
     /// Обновляет данные существующей тренировки
     /// </summary>
-    public Task<bool> Update(TrainingSession entity)
+    public Task<bool> UpdateAsync(TrainingSession entity)
     {
         var existing = _context.TrainingSessions.FirstOrDefault(s => s.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
@@ -65,7 +67,7 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// <summary>
     /// Удаляет тренировочную сессию по ее Id
     /// </summary>
-    public Task<bool> Delete(int id)
+    public Task<bool> DeleteAsync(int id)
     {
         var entity = _context.TrainingSessions.FirstOrDefault(s => s.Id == id);
         if (entity == null) return Task.FromResult(false);

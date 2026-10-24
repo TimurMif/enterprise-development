@@ -21,7 +21,7 @@ public class ClientRepository : IRepository<Client>
     /// </summary>
     public Task<List<Client>> GetAllAsync()
     {
-        return Task.FromResult(_context.Clients);
+        return Task.FromResult(_context.Clients.ToList());
     }
 
     /// <summary>
@@ -35,16 +35,18 @@ public class ClientRepository : IRepository<Client>
     /// <summary>
     /// Добавляет нового клиента
     /// </summary>
-    public Task AddAsync(Client entity)
+    public Task<Client> AddAsync(Client entity)
     {
+        entity.Id = _context.Clients.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
         _context.Clients.Add(entity);
-        return Task.CompletedTask;
+
+        return Task.FromResult(entity);
     }
 
     /// <summary>
     /// Обновляет данные существующего клиента
     /// </summary>
-    public Task<bool> Update(Client entity)
+    public Task<bool> UpdateAsync(Client entity)
     {
         var existing = _context.Clients.FirstOrDefault(c => c.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
@@ -65,7 +67,7 @@ public class ClientRepository : IRepository<Client>
     /// <summary>
     /// Удаляет клиента по его Id
     /// </summary>
-    public Task<bool> Delete(int id)
+    public Task<bool> DeleteAsync(int id)
     {
         var entity = _context.Clients.FirstOrDefault(c => c.Id == id);
         if (entity == null) return Task.FromResult(false);
