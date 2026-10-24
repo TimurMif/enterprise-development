@@ -4,10 +4,12 @@ using FitnessClub.Domain.Data;
 using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
 using FitnessClub.Infrastructure.InMemory.Repositories;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton(sp => DataSeeder.Seed());
 
@@ -25,6 +27,12 @@ builder.Services.AddSingleton<ISpecializationService, SpecializationService>();
 builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.MapControllers();
 
