@@ -16,6 +16,14 @@ Accept: application/json
 GET {{host}}/api/TrainingSessions
 Accept: application/json
 
+### Получить все залы
+GET {{host}}/api/GymHalls
+Accept: application/json
+
+### Получить все специализации
+GET {{host}}/api/Specializations
+Accept: application/json
+
 ### Тренеры со стажем не менее 5 лет
 GET {{host}}/api/Analytics/experienced-trainers
 Accept: application/json

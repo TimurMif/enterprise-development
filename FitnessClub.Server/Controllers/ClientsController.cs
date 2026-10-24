@@ -14,6 +14,9 @@ public class ClientsController : ControllerBase
     private readonly IClientService _clientService;
     private readonly ILogger<ClientsController> _logger;
 
+    /// <summary>
+    /// Инициализирует новый экземпляр контроллера клиента
+    /// </summary>
     public ClientsController(IClientService clientService, ILogger<ClientsController> logger)
     {
         _clientService = clientService;

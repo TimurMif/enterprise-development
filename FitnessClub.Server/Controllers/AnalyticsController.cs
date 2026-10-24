@@ -14,6 +14,9 @@ public class AnalyticsController : ControllerBase
     private readonly IAnalyticsService _analyticsService;
     private readonly ILogger<AnalyticsController> _logger;
 
+    /// <summary>
+    /// Инициализирует новый экземпляр аналитического контроллера
+    /// </summary>
     public AnalyticsController(IAnalyticsService analyticsService, ILogger<AnalyticsController> logger)
     {
         _analyticsService = analyticsService;

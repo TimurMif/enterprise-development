@@ -14,6 +14,9 @@ public class TrainingSessionsController : ControllerBase
     private readonly ILogger<TrainingSessionsController> _logger;
     private readonly ITrainingSessionService _sessionService;
 
+    /// <summary>
+    /// Инициализирует новый экземпляр контроллера тренировок
+    /// </summary>
     public TrainingSessionsController(ITrainingSessionService sessionService,
         ILogger<TrainingSessionsController> logger)
     {
