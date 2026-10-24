@@ -38,7 +38,7 @@ public class TrainingSessionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка тренировок[cite: 52].");
+            _logger.LogError(ex, "Ошибка при получении списка тренировок.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -66,7 +66,7 @@ public class TrainingSessionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении тренировки с ID {Id}[cite: 52].", id);
+            _logger.LogError(ex, "Ошибка при получении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -95,7 +95,7 @@ public class TrainingSessionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании тренировки[cite: 52].");
+            _logger.LogError(ex, "Ошибка при создании тренировки.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -124,7 +124,7 @@ public class TrainingSessionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении тренировки с ID {Id}[cite: 52].", id);
+            _logger.LogError(ex, "Ошибка при обновлении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -152,7 +152,7 @@ public class TrainingSessionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении тренировки с ID {Id}[cite: 52].", id);
+            _logger.LogError(ex, "Ошибка при удалении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }

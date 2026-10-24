@@ -14,6 +14,7 @@
         <ProjectReference Include="..\FitnessClub.Application\FitnessClub.Application.csproj" />
         <ProjectReference Include="..\FitnessClub.Contracts\FitnessClub.Contracts.csproj" />
         <ProjectReference Include="..\FitnessClub.Domain\FitnessClub.Domain.csproj"/>
+        <ProjectReference Include="..\FitnessClub.Infrastructure.InMemory\FitnessClub.Infrastructure.InMemory.csproj" />
     </ItemGroup>
 
 </Project>

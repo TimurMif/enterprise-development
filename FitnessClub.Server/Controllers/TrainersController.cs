@@ -37,7 +37,7 @@ public class TrainersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка тренеров[cite: 53].");
+            _logger.LogError(ex, "Ошибка при получении списка тренеров.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -65,7 +65,7 @@ public class TrainersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении тренера с ID {Id}[cite: 53].", id);
+            _logger.LogError(ex, "Ошибка при получении тренера с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -79,7 +79,7 @@ public class TrainersController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<TrainerDto>> Create([FromBody] TrainerEditDto trainerDto)
     {
-        _logger.LogInformation("Попытка создания нового тренера с паспортом {Passport}.", trainerDto.PassportNumber);
+        _logger.LogInformation("Попытка создания нового тренера.");
         try
         {
             var created = await _trainerService.CreateAsync(trainerDto);
@@ -93,7 +93,7 @@ public class TrainersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании тренера[cite: 53].");
+            _logger.LogError(ex, "Ошибка при создании тренера.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -122,7 +122,7 @@ public class TrainersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении тренера с ID {Id}[cite: 53].", id);
+            _logger.LogError(ex, "Ошибка при обновлении тренера с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -150,7 +150,7 @@ public class TrainersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении тренера с ID {Id}[cite: 53].", id);
+            _logger.LogError(ex, "Ошибка при удалении тренера с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }

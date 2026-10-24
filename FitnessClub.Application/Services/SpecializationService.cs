@@ -1,3 +1,4 @@
+using FitnessClub.Application.Mapping;
 using FitnessClub.Contracts.Dto;
 using FitnessClub.Contracts.Interfaces;
 using FitnessClub.Domain.Interfaces;
@@ -11,13 +12,17 @@ namespace FitnessClub.Application.Services;
 public class SpecializationService : ISpecializationService
 {
     private readonly IRepository<Specialization> _specializationRepository;
+    private readonly IRepository<Trainer> _trainerRepository;
 
     /// <summary>
     /// Инициализирует новый экземпляр сервиса специализаций
     /// </summary>
-    public SpecializationService(IRepository<Specialization> specializationRepository)
+    public SpecializationService(
+        IRepository<Specialization> specializationRepository,
+        IRepository<Trainer> trainerRepository)
     {
         _specializationRepository = specializationRepository;
+        _trainerRepository = trainerRepository;
     }
 
     /// <summary>
@@ -26,7 +31,7 @@ public class SpecializationService : ISpecializationService
     public async Task<List<SpecializationDto>> GetAllAsync()
     {
         var specializations = await _specializationRepository.GetAllAsync();
-        return specializations.Select(MapToDto).ToList();
+        return specializations.Select(s => s.ToDto()).ToList();
     }
 
     /// <summary>
@@ -35,18 +40,49 @@ public class SpecializationService : ISpecializationService
     public async Task<SpecializationDto?> GetByIdAsync(int id)
     {
         var specialization = await _specializationRepository.GetByIdAsync(id);
-        return specialization == null ? null : MapToDto(specialization);
+        return specialization == null ? null : specialization.ToDto();
     }
 
     /// <summary>
-    /// Преобразует доменную модель специализации в объект DTO
+    /// Создает новую запись специализации на основе переданных данных
     /// </summary>
-    private static SpecializationDto MapToDto(Specialization s)
+    public async Task<SpecializationDto> CreateAsync(SpecializationEditDto dto)
     {
-        return new SpecializationDto
+        var created = await _specializationRepository.AddAsync(MapToEntity(dto));
+        return created.ToDto();
+    }
+
+    /// <summary>
+    /// Обновляет данные существующей специализации по ее Id
+    /// </summary>
+    public async Task<bool> UpdateAsync(int id, SpecializationEditDto updatedDto)
+    {
+        var specialization = MapToEntity(updatedDto);
+        specialization.Id = id;
+
+        return await _specializationRepository.UpdateAsync(specialization);
+    }
+
+    /// <summary>
+    /// Удаляет специализацию по ее Id. Если специализация назначена тренерам, выбрасывает исключение
+    /// </summary>
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var trainers = await _trainerRepository.GetAllAsync();
+        if (trainers.Any(t => t.SpecializationId == id))
+            throw new InvalidOperationException("Нельзя удалить специализацию, которая назначена тренерам");
+
+        return await _specializationRepository.DeleteAsync(id);
+    }
+
+    /// <summary>
+    /// Преобразует DTO в доменную модель специализации
+    /// </summary>
+    private static Specialization MapToEntity(SpecializationEditDto dto)
+    {
+        return new Specialization
         {
-            Id = s.Id,
-            Name = s.Name
+            Name = dto.Name
         };
     }
 }

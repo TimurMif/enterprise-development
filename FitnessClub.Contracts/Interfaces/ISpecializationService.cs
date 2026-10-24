@@ -13,4 +13,19 @@ public interface ISpecializationService
     /// Возвращает специализацию по ее Id
     /// </summary>
     Task<SpecializationDto?> GetByIdAsync(int id);
+
+    /// <summary>
+    /// Создает новую специализацию
+    /// </summary>
+    Task<SpecializationDto> CreateAsync(SpecializationEditDto dto);
+
+    /// <summary>
+    /// Обновляет данные существующей специализации
+    /// </summary>
+    Task<bool> UpdateAsync(int id, SpecializationEditDto dto);
+
+    /// <summary>
+    /// Удаляет специализацию по ее Id
+    /// </summary>
+    Task<bool> DeleteAsync(int id);
 }

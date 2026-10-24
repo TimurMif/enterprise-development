@@ -37,7 +37,7 @@ public class AnalyticsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка опытных тренеров[cite: 50].");
+            _logger.LogError(ex, "Ошибка при получении списка опытных тренеров.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -60,7 +60,7 @@ public class AnalyticsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при проверке доступности зала {HallId} на время {CheckTime}[cite: 50].", hallId, checkTime);
+            _logger.LogError(ex, "Ошибка при проверке доступности зала {HallId} на время {CheckTime}.", hallId, checkTime);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -83,7 +83,7 @@ public class AnalyticsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка клиентов с просроченными абонементами[cite: 50].");
+            _logger.LogError(ex, "Ошибка при получении списка клиентов с просроченными абонементами.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -106,7 +106,7 @@ public class AnalyticsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении сессий для зала {HallId} за {Month}/{Year}[cite: 50].", hallId, month, year);
+            _logger.LogError(ex, "Ошибка при получении сессий для зала {HallId} за {Month}/{Year}.", hallId, month, year);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -128,7 +128,7 @@ public class AnalyticsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении топ-5 тренеров[cite: 50].");
+            _logger.LogError(ex, "Ошибка при получении топ-5 тренеров.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }

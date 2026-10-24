@@ -37,7 +37,7 @@ public class ClientsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка клиентов[cite: 51].");
+            _logger.LogError(ex, "Ошибка при получении списка клиентов.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -65,7 +65,7 @@ public class ClientsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении клиента с ID {Id}[cite: 51].", id);
+            _logger.LogError(ex, "Ошибка при получении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -79,7 +79,7 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<ClientDto>> Create([FromBody] ClientEditDto clientDto)
     {
-        _logger.LogInformation("Попытка создания нового клиента с паспортом {Passport}.", clientDto.PassportNumber);
+        _logger.LogInformation("Попытка создания нового клиента.");
         try
         {
             var createdClient = await _clientService.CreateAsync(clientDto);
@@ -88,7 +88,7 @@ public class ClientsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании клиента[cite: 51].");
+            _logger.LogError(ex, "Ошибка при создании клиента.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -117,7 +117,7 @@ public class ClientsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении клиента с ID {Id}[cite: 51].", id);
+            _logger.LogError(ex, "Ошибка при обновлении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -145,7 +145,7 @@ public class ClientsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении клиента с ID {Id}[cite: 51].", id);
+            _logger.LogError(ex, "Ошибка при удалении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
