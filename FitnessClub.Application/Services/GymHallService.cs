@@ -2,6 +2,7 @@ using FitnessClub.Contracts.Dto;
 using FitnessClub.Contracts.Interfaces;
 using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
+using FitnessClub.Application.Mapping;
 
 namespace FitnessClub.Application.Services;
 
@@ -26,7 +27,7 @@ public class GymHallService : IGymHallService
     public async Task<List<GymHallDto>> GetAllAsync()
     {
         var halls = await _gymHallRepository.GetAllAsync();
-        return halls.Select(MapToDto).ToList();
+        return halls.Select(h=>h.ToDto()).ToList();
     }
 
     /// <summary>
@@ -35,7 +36,7 @@ public class GymHallService : IGymHallService
     public async Task<GymHallDto?> GetByIdAsync(int id)
     {
         var hall = await _gymHallRepository.GetByIdAsync(id);
-        return hall == null ? null : MapToDto(hall);
+        return hall == null ? null : hall.ToDto();
     }
 
     /// <summary>
@@ -44,7 +45,7 @@ public class GymHallService : IGymHallService
     public async Task<GymHallDto> CreateAsync(GymHallEditDto dto)
     {
         var created = await _gymHallRepository.AddAsync(MapToEntity(dto));
-        return MapToDto(created);
+        return created.ToDto();
     }
 
     /// <summary>
@@ -75,19 +76,6 @@ public class GymHallService : IGymHallService
         {
             Name = dto.Name,
             Capacity = dto.Capacity
-        };
-    }
-
-    /// <summary>
-    /// Преобразует доменную модель зала в объект передачи данных DTO
-    /// </summary>
-    private static GymHallDto MapToDto(GymHall h)
-    {
-        return new GymHallDto
-        {
-            Id = h.Id,
-            Name = h.Name,
-            Capacity = h.Capacity
         };
     }
 }
