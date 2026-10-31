@@ -26,7 +26,7 @@ public class GymHallService(IRepository<GymHall> gymHallRepository) : IGymHallSe
     public async Task<GymHallDto?> GetByIdAsync(int id)
     {
         var hall = await gymHallRepository.GetByIdAsync(id);
-        return hall == null ? null : hall.ToDto();
+        return hall?.ToDto();
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class GymHallService(IRepository<GymHall> gymHallRepository) : IGymHallSe
     /// </summary>
     public async Task<GymHallDto> CreateAsync(GymHallEditDto dto)
     {
-        var created = await gymHallRepository.AddAsync(MapToEntity(dto));
+        var created = await gymHallRepository.AddAsync(dto.ToEntity());
         return created.ToDto();
     }
 
@@ -43,7 +43,7 @@ public class GymHallService(IRepository<GymHall> gymHallRepository) : IGymHallSe
     /// </summary>
     public async Task<bool> UpdateAsync(int id, GymHallEditDto updatedDto)
     {
-        var hall = MapToEntity(updatedDto);
+        var hall = updatedDto.ToEntity();
         hall.Id = id;
 
         return await gymHallRepository.UpdateAsync(hall);
@@ -55,17 +55,5 @@ public class GymHallService(IRepository<GymHall> gymHallRepository) : IGymHallSe
     public Task<bool> DeleteAsync(int id)
     {
         return gymHallRepository.DeleteAsync(id);
-    }
-
-    /// <summary>
-    /// Преобразует DTO в доменную модель зала
-    /// </summary>
-    private static GymHall MapToEntity(GymHallEditDto dto)
-    {
-        return new GymHall
-        {
-            Name = dto.Name,
-            Capacity = dto.Capacity
-        };
     }
 }

@@ -26,7 +26,7 @@ public class SpecializationService( IRepository<Specialization> specializationRe
     public async Task<SpecializationDto?> GetByIdAsync(int id)
     {
         var specialization = await specializationRepository.GetByIdAsync(id);
-        return specialization == null ? null : specialization.ToDto();
+        return specialization?.ToDto();
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class SpecializationService( IRepository<Specialization> specializationRe
     /// </summary>
     public async Task<SpecializationDto> CreateAsync(SpecializationEditDto dto)
     {
-        var created = await specializationRepository.AddAsync(MapToEntity(dto));
+        var created = await specializationRepository.AddAsync(dto.ToEntity());
         return created.ToDto();
     }
 
@@ -43,7 +43,7 @@ public class SpecializationService( IRepository<Specialization> specializationRe
     /// </summary>
     public async Task<bool> UpdateAsync(int id, SpecializationEditDto updatedDto)
     {
-        var specialization = MapToEntity(updatedDto);
+        var specialization = updatedDto.ToEntity();
         specialization.Id = id;
 
         return await specializationRepository.UpdateAsync(specialization);
@@ -59,16 +59,5 @@ public class SpecializationService( IRepository<Specialization> specializationRe
             throw new InvalidOperationException("Нельзя удалить специализацию, которая назначена тренерам");
 
         return await specializationRepository.DeleteAsync(id);
-    }
-
-    /// <summary>
-    /// Преобразует DTO в доменную модель специализации
-    /// </summary>
-    private static Specialization MapToEntity(SpecializationEditDto dto)
-    {
-        return new Specialization
-        {
-            Name = dto.Name
-        };
     }
 }

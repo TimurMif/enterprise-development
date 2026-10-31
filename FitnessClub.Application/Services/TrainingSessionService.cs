@@ -31,7 +31,7 @@ public class TrainingSessionService(
     public async Task<TrainingSessionDto?> GetByIdAsync(int id)
     {
         var session = await sessionRepository.GetByIdAsync(id);
-        return session == null ? null : session.ToDto();
+        return session?.ToDto();
     }
 
     /// <summary>
@@ -39,10 +39,13 @@ public class TrainingSessionService(
     /// </summary>
     public async Task<TrainingSessionDto?> CreateAsync(TrainingSessionEditDto dto)
     {
-        var session = await BuildSessionAsync(dto);
-        if (session == null) return null;
+        var client = await clientRepository.GetByIdAsync(dto.ClientId);
+        var trainer = await trainerRepository.GetByIdAsync(dto.TrainerId);
+        var gymHall = await gymHallRepository.GetByIdAsync(dto.GymHallId);
+        if (client == null || trainer == null || gymHall == null)
+            return null;
 
-        var created = await sessionRepository.AddAsync(session);
+        var created = await sessionRepository.AddAsync(dto.ToEntity(client, trainer, gymHall));
         return created.ToDto();
     }
 
@@ -51,9 +54,14 @@ public class TrainingSessionService(
     /// </summary>
     public async Task<bool> UpdateAsync(int id, TrainingSessionEditDto updatedDto)
     {
-        var session = await BuildSessionAsync(updatedDto);
-        if (session == null) return false;
+        var client = await clientRepository.GetByIdAsync(updatedDto.ClientId);
+        var trainer = await trainerRepository.GetByIdAsync(updatedDto.TrainerId);
+        var gymHall = await gymHallRepository.GetByIdAsync(updatedDto.GymHallId);
 
+        if (client == null || trainer == null || gymHall == null)
+            return false;
+
+        var session = updatedDto.ToEntity(client, trainer, gymHall);
         session.Id = id;
         return await sessionRepository.UpdateAsync(session);
     }
@@ -64,30 +72,5 @@ public class TrainingSessionService(
     public Task<bool> DeleteAsync(int id)
     {
         return sessionRepository.DeleteAsync(id);
-    }
-
-    /// <summary>
-    /// Собирает доменную модель сессии, находя клиента, тренера и зал по Id.
-    /// </summary>
-    private async Task<TrainingSession?> BuildSessionAsync(TrainingSessionEditDto dto)
-    {
-        var client = await clientRepository.GetByIdAsync(dto.ClientId);
-        var trainer = await trainerRepository.GetByIdAsync(dto.TrainerId);
-        var gymHall = await gymHallRepository.GetByIdAsync(dto.GymHallId);
-
-        if (client == null || trainer == null || gymHall == null) return null;
-
-        return new TrainingSession
-        {
-            ClientId = client.Id,
-            Client = client,
-            TrainerId = trainer.Id,
-            Trainer = trainer,
-            GymHallId = gymHall.Id,
-            GymHall = gymHall,
-            DateTime = dto.DateTime,
-            Duration = dto.Duration,
-            IsTrial = dto.IsTrial
-        };
     }
 }

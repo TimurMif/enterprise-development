@@ -26,7 +26,7 @@ public class ClientService(IRepository<Client> clientRepository) : IClientServic
     public async Task<ClientDto?> GetByIdAsync(int id)
     {
         var client = await clientRepository.GetByIdAsync(id);
-        return client == null ? null : client.ToDto();
+        return client?.ToDto();
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class ClientService(IRepository<Client> clientRepository) : IClientServic
     /// </summary>
     public async Task<ClientDto> CreateAsync(ClientEditDto dto)
     {
-        var created = await clientRepository.AddAsync(MapToEntity(dto));
+        var created = await clientRepository.AddAsync(dto.ToEntity());
         return created.ToDto();
     }
 
@@ -43,7 +43,7 @@ public class ClientService(IRepository<Client> clientRepository) : IClientServic
     /// </summary>
     public async Task<bool> UpdateAsync(int id, ClientEditDto updatedDto)
     {
-        var client = MapToEntity(updatedDto);
+        var client = updatedDto.ToEntity();
         client.Id = id;
 
         return await clientRepository.UpdateAsync(client);
@@ -55,24 +55,5 @@ public class ClientService(IRepository<Client> clientRepository) : IClientServic
     public Task<bool> DeleteAsync(int id)
     {
         return clientRepository.DeleteAsync(id);
-    }
-
-    /// <summary>
-    /// Преобразует DTO в доменную модель клиента
-    /// </summary>
-    private static Client MapToEntity(ClientEditDto dto)
-    {
-        return new Client
-        {
-            PassportNumber = dto.PassportNumber,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            MiddleName = dto.MiddleName,
-            Gender = dto.Gender,
-            DateOfBirth = dto.DateOfBirth,
-            PhoneNumber = dto.PhoneNumber,
-            SubscriptionStartDate = dto.SubscriptionStartDate,
-            SubscriptionEndDate = dto.SubscriptionEndDate
-        };
     }
 }

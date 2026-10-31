@@ -26,7 +26,7 @@ public class TrainerService(IRepository<Trainer> trainerRepository, IRepository<
     public async Task<TrainerDto?> GetByIdAsync(int id)
     {
         var trainer = await trainerRepository.GetByIdAsync(id);
-        return trainer == null ? null : trainer.ToDto();
+        return trainer?.ToDto();
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public class TrainerService(IRepository<Trainer> trainerRepository, IRepository<
         var spec = await specializationRepository.GetByIdAsync(dto.SpecializationId);
         if (spec == null) return null;
 
-        var created = await trainerRepository.AddAsync(MapToEntity(dto, spec));
+        var created = await trainerRepository.AddAsync(dto.ToEntity(spec));
         return created.ToDto();
     }
 
@@ -49,7 +49,7 @@ public class TrainerService(IRepository<Trainer> trainerRepository, IRepository<
         var spec = await specializationRepository.GetByIdAsync(updatedDto.SpecializationId);
         if (spec == null) return false;
 
-        var trainer = MapToEntity(updatedDto, spec);
+        var trainer = updatedDto.ToEntity(spec);
         trainer.Id = id;
 
         return await trainerRepository.UpdateAsync(trainer);
@@ -61,25 +61,5 @@ public class TrainerService(IRepository<Trainer> trainerRepository, IRepository<
     public Task<bool> DeleteAsync(int id)
     {
         return trainerRepository.DeleteAsync(id);
-    }
-
-    /// <summary>
-    /// Преобразует DTO в доменную модель тренера
-    /// </summary>
-    private static Trainer MapToEntity(TrainerEditDto dto, Specialization spec)
-    {
-        return new Trainer
-        {
-            PassportNumber = dto.PassportNumber,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            MiddleName = dto.MiddleName,
-            Gender = dto.Gender,
-            DateOfBirth = dto.DateOfBirth,
-            PhoneNumber = dto.PhoneNumber,
-            ExperienceYears = dto.ExperienceYears,
-            SpecializationId = spec.Id,
-            Specialization = spec
-        };
     }
 }
