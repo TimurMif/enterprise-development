@@ -9,24 +9,14 @@ namespace FitnessClub.Application.Services;
 /// <summary>
 /// Сервис для работы с клиентами фитнес-клуба
 /// </summary>
-public class ClientService : IClientService
+public class ClientService(IRepository<Client> clientRepository) : IClientService
 {
-    private readonly IRepository<Client> _clientRepository;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр сервиса клиентов
-    /// </summary>
-    public ClientService(IRepository<Client> clientRepository)
-    {
-        _clientRepository = clientRepository;
-    }
-
     /// <summary>
     /// Возвращает список всех клиентов фитнес-клуба
     /// </summary>
     public async Task<List<ClientDto>> GetAllAsync()
     {
-        var clients = await _clientRepository.GetAllAsync();
+        var clients = await clientRepository.GetAllAsync();
         return clients.Select(c=>c.ToDto()).ToList();
     }
 
@@ -35,7 +25,7 @@ public class ClientService : IClientService
     /// </summary>
     public async Task<ClientDto?> GetByIdAsync(int id)
     {
-        var client = await _clientRepository.GetByIdAsync(id);
+        var client = await clientRepository.GetByIdAsync(id);
         return client == null ? null : client.ToDto();
     }
 
@@ -44,7 +34,7 @@ public class ClientService : IClientService
     /// </summary>
     public async Task<ClientDto> CreateAsync(ClientEditDto dto)
     {
-        var created = await _clientRepository.AddAsync(MapToEntity(dto));
+        var created = await clientRepository.AddAsync(MapToEntity(dto));
         return created.ToDto();
     }
 
@@ -56,7 +46,7 @@ public class ClientService : IClientService
         var client = MapToEntity(updatedDto);
         client.Id = id;
 
-        return await _clientRepository.UpdateAsync(client);
+        return await clientRepository.UpdateAsync(client);
     }
 
     /// <summary>
@@ -64,7 +54,7 @@ public class ClientService : IClientService
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        return _clientRepository.DeleteAsync(id);
+        return clientRepository.DeleteAsync(id);
     }
 
     /// <summary>

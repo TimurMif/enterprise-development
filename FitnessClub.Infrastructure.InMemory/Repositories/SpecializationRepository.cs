@@ -4,24 +4,14 @@ using FitnessClub.Domain.Models;
 
 namespace FitnessClub.Infrastructure.InMemory.Repositories;
 
-public class SpecializationRepository : IRepository<Specialization>
+public class SpecializationRepository(FitnessClubContext context) : IRepository<Specialization>
 {
-    private readonly FitnessClubContext _context;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр репозитория специализаций
-    /// </summary>
-    public SpecializationRepository(FitnessClubContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Возвращает список всех специализаций
     /// </summary>
     public Task<List<Specialization>> GetAllAsync()
     {
-        return Task.FromResult(_context.Specializations.ToList());
+        return Task.FromResult(context.Specializations.ToList());
     }
 
     /// <summary>
@@ -29,7 +19,7 @@ public class SpecializationRepository : IRepository<Specialization>
     /// </summary>
     public Task<Specialization?> GetByIdAsync(int id)
     {
-        return Task.FromResult(_context.Specializations.FirstOrDefault(s => s.Id == id));
+        return Task.FromResult(context.Specializations.FirstOrDefault(s => s.Id == id));
     }
 
     /// <summary>
@@ -37,8 +27,8 @@ public class SpecializationRepository : IRepository<Specialization>
     /// </summary>
     public Task<Specialization> AddAsync(Specialization entity)
     {
-        entity.Id = _context.Specializations.Select(s => s.Id).DefaultIfEmpty(0).Max() + 1;
-        _context.Specializations.Add(entity);
+        entity.Id = context.Specializations.Select(s => s.Id).DefaultIfEmpty(0).Max() + 1;
+        context.Specializations.Add(entity);
 
         return Task.FromResult(entity);
     }
@@ -48,7 +38,7 @@ public class SpecializationRepository : IRepository<Specialization>
     /// </summary>
     public Task<bool> UpdateAsync(Specialization entity)
     {
-        var existing = _context.Specializations.FirstOrDefault(s => s.Id == entity.Id);
+        var existing = context.Specializations.FirstOrDefault(s => s.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
 
         existing.Name = entity.Name;
@@ -61,12 +51,12 @@ public class SpecializationRepository : IRepository<Specialization>
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        var entity = _context.Specializations.FirstOrDefault(s => s.Id == id);
+        var entity = context.Specializations.FirstOrDefault(s => s.Id == id);
         if (entity == null) return Task.FromResult(false);
 
-        if (_context.Trainers.Any(t => t.SpecializationId == id)) return Task.FromResult(false);
+        if (context.Trainers.Any(t => t.SpecializationId == id)) return Task.FromResult(false);
 
-        _context.Specializations.Remove(entity);
+        context.Specializations.Remove(entity);
 
         return Task.FromResult(true);
     }

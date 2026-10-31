@@ -9,6 +9,7 @@ public record SpecializationDto
     /// Уникальный идентификатор
     /// </summary>
     public int Id { get; init; }
+    
     /// <summary>
     /// Название специализации
     /// </summary>

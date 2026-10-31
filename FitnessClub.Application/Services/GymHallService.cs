@@ -9,24 +9,14 @@ namespace FitnessClub.Application.Services;
 /// <summary>
 /// Сервис для работы со спортивными залами
 /// </summary>
-public class GymHallService : IGymHallService
+public class GymHallService(IRepository<GymHall> gymHallRepository) : IGymHallService
 {
-    private readonly IRepository<GymHall> _gymHallRepository;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр сервиса залов
-    /// </summary>
-    public GymHallService(IRepository<GymHall> gymHallRepository)
-    {
-        _gymHallRepository = gymHallRepository;
-    }
-
     /// <summary>
     /// Возвращает список всех залов фитнес-клуба
     /// </summary>
     public async Task<List<GymHallDto>> GetAllAsync()
     {
-        var halls = await _gymHallRepository.GetAllAsync();
+        var halls = await gymHallRepository.GetAllAsync();
         return halls.Select(h=>h.ToDto()).ToList();
     }
 
@@ -35,7 +25,7 @@ public class GymHallService : IGymHallService
     /// </summary>
     public async Task<GymHallDto?> GetByIdAsync(int id)
     {
-        var hall = await _gymHallRepository.GetByIdAsync(id);
+        var hall = await gymHallRepository.GetByIdAsync(id);
         return hall == null ? null : hall.ToDto();
     }
 
@@ -44,7 +34,7 @@ public class GymHallService : IGymHallService
     /// </summary>
     public async Task<GymHallDto> CreateAsync(GymHallEditDto dto)
     {
-        var created = await _gymHallRepository.AddAsync(MapToEntity(dto));
+        var created = await gymHallRepository.AddAsync(MapToEntity(dto));
         return created.ToDto();
     }
 
@@ -56,7 +46,7 @@ public class GymHallService : IGymHallService
         var hall = MapToEntity(updatedDto);
         hall.Id = id;
 
-        return await _gymHallRepository.UpdateAsync(hall);
+        return await gymHallRepository.UpdateAsync(hall);
     }
 
     /// <summary>
@@ -64,7 +54,7 @@ public class GymHallService : IGymHallService
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        return _gymHallRepository.DeleteAsync(id);
+        return gymHallRepository.DeleteAsync(id);
     }
 
     /// <summary>

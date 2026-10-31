@@ -9,10 +9,12 @@ public record GymHallDto
     /// Уникальный идентификатор
     /// </summary>
     public int Id { get; init; }
+    
     /// <summary>
     /// Название зала
     /// </summary>
     public required string Name { get; init; }
+    
     /// <summary>
     /// Вместимость
     /// </summary>

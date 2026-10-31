@@ -4,24 +4,14 @@ using FitnessClub.Domain.Models;
 
 namespace FitnessClub.Infrastructure.InMemory.Repositories;
 
-public class TrainingSessionRepository : IRepository<TrainingSession>
+public class TrainingSessionRepository(FitnessClubContext context) : IRepository<TrainingSession>
 {
-    private readonly FitnessClubContext _context;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр репозитория тренировочных сессий
-    /// </summary>
-    public TrainingSessionRepository(FitnessClubContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Возвращает список всех тренировочных сессий
     /// </summary>
     public Task<List<TrainingSession>> GetAllAsync()
     {
-        return Task.FromResult(_context.TrainingSessions.ToList());
+        return Task.FromResult(context.TrainingSessions.ToList());
     }
 
     /// <summary>
@@ -29,7 +19,7 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// </summary>
     public Task<TrainingSession?> GetByIdAsync(int id)
     {
-        return Task.FromResult(_context.TrainingSessions.FirstOrDefault(s => s.Id == id));
+        return Task.FromResult(context.TrainingSessions.FirstOrDefault(s => s.Id == id));
     }
 
     /// <summary>
@@ -37,8 +27,8 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// </summary>
     public Task<TrainingSession> AddAsync(TrainingSession entity)
     {
-        entity.Id = _context.TrainingSessions.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
-        _context.TrainingSessions.Add(entity);
+        entity.Id = context.TrainingSessions.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
+        context.TrainingSessions.Add(entity);
 
         return Task.FromResult(entity);
     }
@@ -48,7 +38,7 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// </summary>
     public Task<bool> UpdateAsync(TrainingSession entity)
     {
-        var existing = _context.TrainingSessions.FirstOrDefault(s => s.Id == entity.Id);
+        var existing = context.TrainingSessions.FirstOrDefault(s => s.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
 
         existing.ClientId = entity.ClientId;
@@ -69,10 +59,10 @@ public class TrainingSessionRepository : IRepository<TrainingSession>
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        var entity = _context.TrainingSessions.FirstOrDefault(s => s.Id == id);
+        var entity = context.TrainingSessions.FirstOrDefault(s => s.Id == id);
         if (entity == null) return Task.FromResult(false);
 
-        _context.TrainingSessions.Remove(entity);
+        context.TrainingSessions.Remove(entity);
         
         return Task.FromResult(true);
     }

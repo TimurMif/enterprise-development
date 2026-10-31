@@ -9,21 +9,9 @@ namespace FitnessClub.Server.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class TrainingSessionsController : ControllerBase
+public class TrainingSessionsController(ILogger<TrainingSessionsController> logger,
+    ITrainingSessionService sessionService) : ControllerBase
 {
-    private readonly ILogger<TrainingSessionsController> _logger;
-    private readonly ITrainingSessionService _sessionService;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр контроллера тренировок
-    /// </summary>
-    public TrainingSessionsController(ITrainingSessionService sessionService,
-        ILogger<TrainingSessionsController> logger)
-    {
-        _sessionService = sessionService;
-        _logger = logger;
-    }
-
     /// <summary>
     /// Список всех тренировок
     /// </summary>
@@ -32,16 +20,16 @@ public class TrainingSessionsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<List<TrainingSessionDto>>> GetAll()
     {
-        _logger.LogInformation("Запрос на получение списка всех тренировок.");
+        logger.LogInformation("Запрос на получение списка всех тренировок.");
         try
         {
-            var result = await _sessionService.GetAllAsync();
-            _logger.LogInformation("Успешно получено тренировок: {Count}.", result.Count);
+            var result = await sessionService.GetAllAsync();
+            logger.LogInformation("Успешно получено тренировок: {Count}.", result.Count);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка тренировок.");
+            logger.LogError(ex, "Ошибка при получении списка тренировок.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -55,21 +43,21 @@ public class TrainingSessionsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<TrainingSessionDto>> GetById(int id)
     {
-        _logger.LogInformation("Запрос информации о тренировке с ID {Id}.", id);
+        logger.LogInformation("Запрос информации о тренировке с ID {Id}.", id);
         try
         {
-            var session = await _sessionService.GetByIdAsync(id);
+            var session = await sessionService.GetByIdAsync(id);
             if (session == null)
             {
-                _logger.LogWarning("Тренировка с ID {Id} не найдена.", id);
+                logger.LogWarning("Тренировка с ID {Id} не найдена.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно получена тренировка с ID {Id}.", id);
+            logger.LogInformation("Успешно получена тренировка с ID {Id}.", id);
             return Ok(session);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении тренировки с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при получении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -83,22 +71,22 @@ public class TrainingSessionsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<TrainingSessionDto>> Create([FromBody] TrainingSessionEditDto sessionDto)
     {
-        _logger.LogInformation("Попытка создания новой тренировки для клиента ID {ClientId}, тренера ID {TrainerId} в зале ID {HallId}.",
+        logger.LogInformation("Попытка создания новой тренировки для клиента ID {ClientId}, тренера ID {TrainerId} в зале ID {HallId}.",
             sessionDto.ClientId, sessionDto.TrainerId, sessionDto.GymHallId);
         try
         {
-            var created = await _sessionService.CreateAsync(sessionDto);
+            var created = await sessionService.CreateAsync(sessionDto);
             if (created == null)
             {
-                _logger.LogWarning("Не удалось создать тренировку: неверный ID клиента, тренера или зала.");
+                logger.LogWarning("Не удалось создать тренировку: неверный ID клиента, тренера или зала.");
                 return BadRequest("Неверный ID клиента, тренера или зала");
             }
-            _logger.LogInformation("Успешно создана тренировка с ID {Id}.", created.Id);
+            logger.LogInformation("Успешно создана тренировка с ID {Id}.", created.Id);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании тренировки.");
+            logger.LogError(ex, "Ошибка при создании тренировки.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -113,21 +101,21 @@ public class TrainingSessionsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> Update(int id, [FromBody] TrainingSessionEditDto sessionDto)
     {
-        _logger.LogInformation("Попытка обновления тренировки с ID {Id}.", id);
+        logger.LogInformation("Попытка обновления тренировки с ID {Id}.", id);
         try
         {
-            var success = await _sessionService.UpdateAsync(id, sessionDto);
+            var success = await sessionService.UpdateAsync(id, sessionDto);
             if (!success)
             {
-                _logger.LogWarning("Тренировка с ID {Id} не найдена или связанные сущности недействительны.", id);
+                logger.LogWarning("Тренировка с ID {Id} не найдена или связанные сущности недействительны.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно обновлена тренировка с ID {Id}.", id);
+            logger.LogInformation("Успешно обновлена тренировка с ID {Id}.", id);
             return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении тренировки с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при обновлении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -141,21 +129,21 @@ public class TrainingSessionsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> Delete(int id)
     {
-        _logger.LogInformation("Попытка удаления тренировки с ID {Id}.", id);
+        logger.LogInformation("Попытка удаления тренировки с ID {Id}.", id);
         try
         {
-            var success = await _sessionService.DeleteAsync(id);
+            var success = await sessionService.DeleteAsync(id);
             if (!success)
             {
-                _logger.LogWarning("Тренировка с ID {Id} не найдена для удаления.", id);
+                logger.LogWarning("Тренировка с ID {Id} не найдена для удаления.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно удалена тренировка с ID {Id}.", id);
+            logger.LogInformation("Успешно удалена тренировка с ID {Id}.", id);
             return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении тренировки с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при удалении тренировки с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }

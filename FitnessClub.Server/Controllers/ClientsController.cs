@@ -9,20 +9,9 @@ namespace FitnessClub.Server.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class ClientsController : ControllerBase
+public class ClientsController(IClientService clientService, 
+    ILogger<ClientsController> logger) : ControllerBase
 {
-    private readonly IClientService _clientService;
-    private readonly ILogger<ClientsController> _logger;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр контроллера клиента
-    /// </summary>
-    public ClientsController(IClientService clientService, ILogger<ClientsController> logger)
-    {
-        _clientService = clientService;
-        _logger = logger;
-    }
-
     /// <summary>
     /// Список всех клиентов
     /// </summary>
@@ -31,16 +20,16 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<List<ClientDto>>> GetAll()
     {
-        _logger.LogInformation("Запрос на получение списка всех клиентов.");
+        logger.LogInformation("Запрос на получение списка всех клиентов.");
         try
         {
-            var result = await _clientService.GetAllAsync();
-            _logger.LogInformation("Успешно получено клиентов: {Count}.", result.Count);
+            var result = await clientService.GetAllAsync();
+            logger.LogInformation("Успешно получено клиентов: {Count}.", result.Count);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении списка клиентов.");
+            logger.LogError(ex, "Ошибка при получении списка клиентов.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -54,21 +43,21 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<ClientDto>> GetById(int id)
     {
-        _logger.LogInformation("Запрос информации о клиенте с ID {Id}.", id);
+        logger.LogInformation("Запрос информации о клиенте с ID {Id}.", id);
         try
         {
-            var client = await _clientService.GetByIdAsync(id);
+            var client = await clientService.GetByIdAsync(id);
             if (client == null)
             {
-                _logger.LogWarning("Клиент с ID {Id} не найден.", id);
+                logger.LogWarning("Клиент с ID {Id} не найден.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно получен клиент с ID {Id}.", id);
+            logger.LogInformation("Успешно получен клиент с ID {Id}.", id);
             return Ok(client);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при получении клиента с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при получении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -82,16 +71,16 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<ActionResult<ClientDto>> Create([FromBody] ClientEditDto clientDto)
     {
-        _logger.LogInformation("Попытка создания нового клиента.");
+        logger.LogInformation("Попытка создания нового клиента.");
         try
         {
-            var createdClient = await _clientService.CreateAsync(clientDto);
-            _logger.LogInformation("Успешно создан клиент с ID {Id}.", createdClient.Id);
+            var createdClient = await clientService.CreateAsync(clientDto);
+            logger.LogInformation("Успешно создан клиент с ID {Id}.", createdClient.Id);
             return CreatedAtAction(nameof(GetById), new { id = createdClient.Id }, createdClient);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании клиента.");
+            logger.LogError(ex, "Ошибка при создании клиента.");
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -106,21 +95,21 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> Update(int id, [FromBody] ClientEditDto clientDto)
     {
-        _logger.LogInformation("Попытка обновления клиента с ID {Id}.", id);
+        logger.LogInformation("Попытка обновления клиента с ID {Id}.", id);
         try
         {
-            var success = await _clientService.UpdateAsync(id, clientDto);
+            var success = await clientService.UpdateAsync(id, clientDto);
             if (!success)
             {
-                _logger.LogWarning("Клиент с ID {Id} не найден для обновления.", id);
+                logger.LogWarning("Клиент с ID {Id} не найден для обновления.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно обновлен клиент с ID {Id}.", id);
+            logger.LogInformation("Успешно обновлен клиент с ID {Id}.", id);
             return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при обновлении клиента с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при обновлении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }
@@ -134,21 +123,21 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> Delete(int id)
     {
-        _logger.LogInformation("Попытка удаления клиента с ID {Id}.", id);
+        logger.LogInformation("Попытка удаления клиента с ID {Id}.", id);
         try
         {
-            var success = await _clientService.DeleteAsync(id);
+            var success = await clientService.DeleteAsync(id);
             if (!success)
             {
-                _logger.LogWarning("Клиент с ID {Id} не найден для удаления.", id);
+                logger.LogWarning("Клиент с ID {Id} не найден для удаления.", id);
                 return NotFound();
             }
-            _logger.LogInformation("Успешно удален клиент с ID {Id}.", id);
+            logger.LogInformation("Успешно удален клиент с ID {Id}.", id);
             return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при удалении клиента с ID {Id}.", id);
+            logger.LogError(ex, "Ошибка при удалении клиента с ID {Id}.", id);
             return StatusCode(500, "Внутренняя ошибка сервера");
         }
     }

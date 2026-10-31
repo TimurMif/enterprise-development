@@ -9,31 +9,16 @@ namespace FitnessClub.Application.Services;
 /// <summary>
 /// Сервис аналитических запросов по данным фитнес-клуба
 /// </summary>
-public class AnalyticsService : IAnalyticsService
+public class AnalyticsService(IRepository<Trainer> trainerRepository,
+    IRepository<Client> clientRepository,
+    IRepository<TrainingSession> sessionRepository) : IAnalyticsService
 {
-    private readonly IRepository<Trainer> _trainerRepository;
-    private readonly IRepository<Client> _clientRepository;
-    private readonly IRepository<TrainingSession> _sessionRepository;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр сервиса аналитики
-    /// </summary>
-    public AnalyticsService(
-        IRepository<Trainer> trainerRepository,
-        IRepository<Client> clientRepository,
-        IRepository<TrainingSession> sessionRepository)
-    {
-        _trainerRepository = trainerRepository;
-        _clientRepository = clientRepository;
-        _sessionRepository = sessionRepository;
-    }
-
     /// <summary>
     /// Возвращает список тренеров со стажем не менее 5 лет
     /// </summary>
     public async Task<List<TrainerDto>> GetTrainersWithAtLeast5YearsExperienceAsync()
     {
-        var trainers = await _trainerRepository.GetAllAsync();
+        var trainers = await trainerRepository.GetAllAsync();
 
         var result = trainers
             .Where(t => t.ExperienceYears >= 5)
@@ -47,7 +32,7 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<bool> IsHallAvailableAsync(int hallId, DateTime checkTime)
     {
-        var sessions = await _sessionRepository.GetAllAsync();
+        var sessions = await sessionRepository.GetAllAsync();
 
         var isOccupied = sessions.Any(s =>
             s.GymHallId == hallId &&
@@ -62,7 +47,7 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<ClientDto>> GetClientsWithExpiredSubscriptionAsync(DateOnly referenceDate)
     {
-        var clients = await _clientRepository.GetAllAsync();
+        var clients = await clientRepository.GetAllAsync();
 
         var result = clients
             .Where(c => c.SubscriptionEndDate < referenceDate)
@@ -80,7 +65,7 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<TrainingSessionDto>> GetSessionsForMonthInHallAsync(int hallId, int year, int month)
     {
-        var sessions = await _sessionRepository.GetAllAsync();
+        var sessions = await sessionRepository.GetAllAsync();
 
         var result = sessions
             .Where(s => s.GymHallId == hallId
@@ -97,8 +82,8 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<TrainerDto>> GetTop5TrainersAsync()
     {
-        var sessions = await _sessionRepository.GetAllAsync();
-        var allTrainers = await _trainerRepository.GetAllAsync();
+        var sessions = await sessionRepository.GetAllAsync();
+        var allTrainers = await trainerRepository.GetAllAsync();
 
         var topTrainerIds = sessions
             .GroupBy(s => s.TrainerId)

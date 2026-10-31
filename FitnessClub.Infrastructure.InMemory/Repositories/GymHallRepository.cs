@@ -4,24 +4,14 @@ using FitnessClub.Domain.Models;
 
 namespace FitnessClub.Infrastructure.InMemory.Repositories;
 
-public class GymHallRepository : IRepository<GymHall>
+public class GymHallRepository(FitnessClubContext context) : IRepository<GymHall>
 {
-    private readonly FitnessClubContext _context;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр репозитория залов
-    /// </summary>
-    public GymHallRepository(FitnessClubContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Возвращает список всех залов
     /// </summary>
     public Task<List<GymHall>> GetAllAsync()
     {
-        return Task.FromResult(_context.GymHalls.ToList());
+        return Task.FromResult(context.GymHalls.ToList());
     }
 
     /// <summary>
@@ -29,7 +19,7 @@ public class GymHallRepository : IRepository<GymHall>
     /// </summary>
     public Task<GymHall?> GetByIdAsync(int id)
     {
-        return Task.FromResult(_context.GymHalls.FirstOrDefault(h => h.Id == id));
+        return Task.FromResult(context.GymHalls.FirstOrDefault(h => h.Id == id));
     }
 
     /// <summary>
@@ -37,8 +27,8 @@ public class GymHallRepository : IRepository<GymHall>
     /// </summary>
     public Task<GymHall> AddAsync(GymHall entity)
     {
-        entity.Id = _context.GymHalls.Select(h => h.Id).DefaultIfEmpty(0).Max() + 1;
-        _context.GymHalls.Add(entity);
+        entity.Id = context.GymHalls.Select(h => h.Id).DefaultIfEmpty(0).Max() + 1;
+        context.GymHalls.Add(entity);
 
         return Task.FromResult(entity);
     }
@@ -48,7 +38,7 @@ public class GymHallRepository : IRepository<GymHall>
     /// </summary>
     public Task<bool> UpdateAsync(GymHall entity)
     {
-        var existing = _context.GymHalls.FirstOrDefault(h => h.Id == entity.Id);
+        var existing = context.GymHalls.FirstOrDefault(h => h.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
 
         existing.Name = entity.Name;
@@ -62,11 +52,11 @@ public class GymHallRepository : IRepository<GymHall>
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        var entity = _context.GymHalls.FirstOrDefault(h => h.Id == id);
+        var entity = context.GymHalls.FirstOrDefault(h => h.Id == id);
         if (entity == null) return Task.FromResult(false);
 
-        _context.TrainingSessions.RemoveAll(s => s.GymHallId == id);
-        _context.GymHalls.Remove(entity);
+        context.TrainingSessions.RemoveAll(s => s.GymHallId == id);
+        context.GymHalls.Remove(entity);
 
         return Task.FromResult(true);
     }

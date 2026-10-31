@@ -9,28 +9,14 @@ namespace FitnessClub.Application.Services;
 /// <summary>
 /// Сервис для работы с тренерами фитнес-клуба
 /// </summary>
-public class TrainerService : ITrainerService
+public class TrainerService(IRepository<Trainer> trainerRepository, IRepository<Specialization> specializationRepository) : ITrainerService
 {
-    private readonly IRepository<Trainer> _trainerRepository;
-    private readonly IRepository<Specialization> _specializationRepository;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр сервиса тренеров
-    /// </summary>
-    public TrainerService(
-        IRepository<Trainer> trainerRepository,
-        IRepository<Specialization> specializationRepository)
-    {
-        _trainerRepository = trainerRepository;
-        _specializationRepository = specializationRepository;
-    }
-
     /// <summary>
     /// Возвращает список всех тренеров фитнес-клуба
     /// </summary>
     public async Task<List<TrainerDto>> GetAllAsync()
     {
-        var trainers = await _trainerRepository.GetAllAsync();
+        var trainers = await trainerRepository.GetAllAsync();
         return trainers.Select(t => t.ToDto()).ToList();
     }
 
@@ -39,7 +25,7 @@ public class TrainerService : ITrainerService
     /// </summary>
     public async Task<TrainerDto?> GetByIdAsync(int id)
     {
-        var trainer = await _trainerRepository.GetByIdAsync(id);
+        var trainer = await trainerRepository.GetByIdAsync(id);
         return trainer == null ? null : trainer.ToDto();
     }
 
@@ -48,10 +34,10 @@ public class TrainerService : ITrainerService
     /// </summary>
     public async Task<TrainerDto?> CreateAsync(TrainerEditDto dto)
     {
-        var spec = await _specializationRepository.GetByIdAsync(dto.SpecializationId);
+        var spec = await specializationRepository.GetByIdAsync(dto.SpecializationId);
         if (spec == null) return null;
 
-        var created = await _trainerRepository.AddAsync(MapToEntity(dto, spec));
+        var created = await trainerRepository.AddAsync(MapToEntity(dto, spec));
         return created.ToDto();
     }
 
@@ -60,13 +46,13 @@ public class TrainerService : ITrainerService
     /// </summary>
     public async Task<bool> UpdateAsync(int id, TrainerEditDto updatedDto)
     {
-        var spec = await _specializationRepository.GetByIdAsync(updatedDto.SpecializationId);
+        var spec = await specializationRepository.GetByIdAsync(updatedDto.SpecializationId);
         if (spec == null) return false;
 
         var trainer = MapToEntity(updatedDto, spec);
         trainer.Id = id;
 
-        return await _trainerRepository.UpdateAsync(trainer);
+        return await trainerRepository.UpdateAsync(trainer);
     }
 
     /// <summary>
@@ -74,7 +60,7 @@ public class TrainerService : ITrainerService
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        return _trainerRepository.DeleteAsync(id);
+        return trainerRepository.DeleteAsync(id);
     }
 
     /// <summary>

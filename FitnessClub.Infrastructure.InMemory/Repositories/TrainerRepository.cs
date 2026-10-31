@@ -4,24 +4,14 @@ using FitnessClub.Domain.Models;
 
 namespace FitnessClub.Infrastructure.InMemory.Repositories;
 
-public class TrainerRepository : IRepository<Trainer>
+public class TrainerRepository(FitnessClubContext context) : IRepository<Trainer>
 {
-    private readonly FitnessClubContext _context;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр репозитория тренеров
-    /// </summary>
-    public TrainerRepository(FitnessClubContext context)
-    {
-        _context = context;
-    }
-
     /// <summary>
     /// Возвращает список всех тренеров
     /// </summary>
     public Task<List<Trainer>> GetAllAsync()
     {
-        return Task.FromResult(_context.Trainers.ToList());
+        return Task.FromResult(context.Trainers.ToList());
     }
 
     /// <summary>
@@ -29,7 +19,7 @@ public class TrainerRepository : IRepository<Trainer>
     /// </summary>
     public Task<Trainer?> GetByIdAsync(int id)
     {
-        return Task.FromResult(_context.Trainers.FirstOrDefault(t => t.Id == id));
+        return Task.FromResult(context.Trainers.FirstOrDefault(t => t.Id == id));
     }
 
     /// <summary>
@@ -37,8 +27,8 @@ public class TrainerRepository : IRepository<Trainer>
     /// </summary>
     public Task<Trainer> AddAsync(Trainer entity)
     {
-        entity.Id = _context.Trainers.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
-        _context.Trainers.Add(entity);
+        entity.Id = context.Trainers.Select(c => c.Id).DefaultIfEmpty(0).Max() + 1;
+        context.Trainers.Add(entity);
 
         return Task.FromResult(entity);
     }
@@ -48,7 +38,7 @@ public class TrainerRepository : IRepository<Trainer>
     /// </summary>
     public Task<bool> UpdateAsync(Trainer entity)
     {
-        var existing = _context.Trainers.FirstOrDefault(t => t.Id == entity.Id);
+        var existing = context.Trainers.FirstOrDefault(t => t.Id == entity.Id);
         if (existing == null) return Task.FromResult(false);
 
         existing.PassportNumber = entity.PassportNumber;
@@ -70,11 +60,11 @@ public class TrainerRepository : IRepository<Trainer>
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        var entity = _context.Trainers.FirstOrDefault(t => t.Id == id);
+        var entity = context.Trainers.FirstOrDefault(t => t.Id == id);
         if (entity == null) return Task.FromResult(false);
 
-        _context.TrainingSessions.RemoveAll(s => s.TrainerId == id);
-        _context.Trainers.Remove(entity);
+        context.TrainingSessions.RemoveAll(s => s.TrainerId == id);
+        context.Trainers.Remove(entity);
         
         return Task.FromResult(true);
     }

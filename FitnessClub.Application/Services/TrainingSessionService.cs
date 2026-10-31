@@ -9,34 +9,19 @@ namespace FitnessClub.Application.Services;
 /// <summary>
 /// Сервис для работы с тренировочными сессиями фитнес-клуба
 /// </summary>
-public class TrainingSessionService : ITrainingSessionService
+public class TrainingSessionService(
+    IRepository<TrainingSession> sessionRepository, 
+    IRepository<Client> clientRepository,
+    IRepository<Trainer> trainerRepository,
+    IRepository<GymHall> gymHallRepository
+    ) : ITrainingSessionService
 {
-    private readonly IRepository<TrainingSession> _sessionRepository;
-    private readonly IRepository<Client> _clientRepository;
-    private readonly IRepository<Trainer> _trainerRepository;
-    private readonly IRepository<GymHall> _gymHallRepository;
-
-    /// <summary>
-    /// Инициализирует новый экземпляр сервиса тренировочных сессий
-    /// </summary>
-    public TrainingSessionService(
-        IRepository<TrainingSession> sessionRepository,
-        IRepository<Client> clientRepository,
-        IRepository<Trainer> trainerRepository,
-        IRepository<GymHall> gymHallRepository)
-    {
-        _sessionRepository = sessionRepository;
-        _clientRepository = clientRepository;
-        _trainerRepository = trainerRepository;
-        _gymHallRepository = gymHallRepository;
-    }
-
     /// <summary>
     /// Возвращает список всех тренировочных сессий
     /// </summary>
     public async Task<List<TrainingSessionDto>> GetAllAsync()
     {
-        var sessions = await _sessionRepository.GetAllAsync();
+        var sessions = await sessionRepository.GetAllAsync();
         return sessions.Select(s => s.ToDto()).ToList();
     }
 
@@ -45,7 +30,7 @@ public class TrainingSessionService : ITrainingSessionService
     /// </summary>
     public async Task<TrainingSessionDto?> GetByIdAsync(int id)
     {
-        var session = await _sessionRepository.GetByIdAsync(id);
+        var session = await sessionRepository.GetByIdAsync(id);
         return session == null ? null : session.ToDto();
     }
 
@@ -57,7 +42,7 @@ public class TrainingSessionService : ITrainingSessionService
         var session = await BuildSessionAsync(dto);
         if (session == null) return null;
 
-        var created = await _sessionRepository.AddAsync(session);
+        var created = await sessionRepository.AddAsync(session);
         return created.ToDto();
     }
 
@@ -70,7 +55,7 @@ public class TrainingSessionService : ITrainingSessionService
         if (session == null) return false;
 
         session.Id = id;
-        return await _sessionRepository.UpdateAsync(session);
+        return await sessionRepository.UpdateAsync(session);
     }
 
     /// <summary>
@@ -78,7 +63,7 @@ public class TrainingSessionService : ITrainingSessionService
     /// </summary>
     public Task<bool> DeleteAsync(int id)
     {
-        return _sessionRepository.DeleteAsync(id);
+        return sessionRepository.DeleteAsync(id);
     }
 
     /// <summary>
@@ -86,9 +71,9 @@ public class TrainingSessionService : ITrainingSessionService
     /// </summary>
     private async Task<TrainingSession?> BuildSessionAsync(TrainingSessionEditDto dto)
     {
-        var client = await _clientRepository.GetByIdAsync(dto.ClientId);
-        var trainer = await _trainerRepository.GetByIdAsync(dto.TrainerId);
-        var gymHall = await _gymHallRepository.GetByIdAsync(dto.GymHallId);
+        var client = await clientRepository.GetByIdAsync(dto.ClientId);
+        var trainer = await trainerRepository.GetByIdAsync(dto.TrainerId);
+        var gymHall = await gymHallRepository.GetByIdAsync(dto.GymHallId);
 
         if (client == null || trainer == null || gymHall == null) return null;
 
