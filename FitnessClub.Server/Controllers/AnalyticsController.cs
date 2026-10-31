@@ -106,9 +106,9 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
     /// Топ-5 популярных тренеров
     /// </summary>
     [HttpGet("top-5-trainers")]
-    [ProducesResponseType(typeof(List<TrainerDto>), 200)]
+    [ProducesResponseType(typeof(List<PopularTrainerDto>), 200)]
     [ProducesResponseType(500)]
-    public async Task<ActionResult<List<TrainerDto>>> GetTopTrainers()
+    public async Task<ActionResult<List<PopularTrainerDto>>> GetTopTrainers()
     {
         logger.LogInformation("Запрос топ-5 популярных тренеров.");
         try
