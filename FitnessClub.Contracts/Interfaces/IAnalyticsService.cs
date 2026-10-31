@@ -30,5 +30,5 @@ public interface IAnalyticsService
     /// <summary>
     /// Возвращает список топ-5 популярных тренеров
     /// </summary>
-    public Task<List<TrainerDto>> GetTop5TrainersAsync();
+    public Task<List<PopularTrainerDto>> GetTop5TrainersAsync();
 }

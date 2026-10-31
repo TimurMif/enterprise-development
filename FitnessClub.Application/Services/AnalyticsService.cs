@@ -80,24 +80,32 @@ public class AnalyticsService(IRepository<Trainer> trainerRepository,
     /// <summary>
     /// Возвращает список топ-5 самых популярных тренеров
     /// </summary>
-    public async Task<List<TrainerDto>> GetTop5TrainersAsync()
+    public async Task<List<PopularTrainerDto>> GetTop5TrainersAsync()
     {
         var sessions = await sessionRepository.GetAllAsync();
         var allTrainers = await trainerRepository.GetAllAsync();
 
-        var topTrainerIds = sessions
+        var topTrainerStats = sessions
             .GroupBy(s => s.TrainerId)
             .OrderByDescending(g => g.Count())
-            .Select(g => g.Key)
+            .Select(g => new { TrainerId = g.Key, SessionsCount = g.Count() })
             .ToList();
 
-        var trainers = topTrainerIds
-            .Select(id => allTrainers.FirstOrDefault(t => t.Id == id))
-            .OfType<Trainer>()
+        var result = topTrainerStats
+            .Select(x => new
+            {
+                Trainer = allTrainers.FirstOrDefault(t => t.Id == x.TrainerId),
+                x.SessionsCount
+            })
+            .Where(x => x.Trainer != null)
             .Take(5)
-            .Select(t => t.ToDto())
+            .Select(x => new PopularTrainerDto
+            {
+                Trainer = x.Trainer!.ToDto(),
+                SessionsCount = x.SessionsCount
+            })
             .ToList();
 
-        return trainers;
+        return result;
     }
 }
