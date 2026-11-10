@@ -1,8 +1,9 @@
 <Solution>
-    <Project Path="FitnessClub.Domain/FitnessClub.Domain.csproj" />
-    <Project Path="FitnessClub.Contracts/FitnessClub.Contracts.csproj" />
-    <Project Path="FitnessClub.Application/FitnessClub.Application.csproj" />
-    <Project Path="FitnessClub.Infrastructure.InMemory/FitnessClub.Infrastructure.InMemory.csproj" />
-    <Project Path="FitnessClub.Server/FitnessClub.Server.csproj" />
-    <Project Path="FitnessClub.Tests/FitnessClub.Tests.csproj" />
+  <Project Path="FitnessClub.Application/FitnessClub.Application.csproj" />
+  <Project Path="FitnessClub.Contracts/FitnessClub.Contracts.csproj" />
+  <Project Path="FitnessClub.Domain/FitnessClub.Domain.csproj" />
+  <Project Path="FitnessClub.Infrastructure.EfCore\FitnessClub.Infrastructure.EfCore.csproj" Type="Classic C#" />
+  <Project Path="FitnessClub.Infrastructure.InMemory/FitnessClub.Infrastructure.InMemory.csproj" />
+  <Project Path="FitnessClub.Server/FitnessClub.Server.csproj" />
+  <Project Path="FitnessClub.Tests/FitnessClub.Tests.csproj" />
 </Solution>
