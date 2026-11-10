@@ -3,21 +3,24 @@ using FitnessClub.Contracts.Interfaces;
 using FitnessClub.Domain.Data;
 using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
-using FitnessClub.Infrastructure.InMemory.Repositories;
+using FitnessClub.Infrastructure.EfCore;
+using FitnessClub.Infrastructure.EfCore.Repositories;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddNpgsqlDbContext<FitnessClubDbContext>("Postgres");
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.Services.AddSingleton(sp => DataSeeder.Seed());
+//builder.Services.AddSingleton(sp => DataSeeder.Seed());
 
-builder.Services.AddSingleton<IRepository<Client>, ClientRepository>();
-builder.Services.AddSingleton<IRepository<Trainer>, TrainerRepository>();
-builder.Services.AddSingleton<IRepository<TrainingSession>, TrainingSessionRepository>();
-builder.Services.AddSingleton<IRepository<GymHall>, GymHallRepository>();
-builder.Services.AddSingleton<IRepository<Specialization>, SpecializationRepository>();
+builder.Services.AddSingleton<IRepository<Client>, ClientEfCoreRepository>();
+builder.Services.AddSingleton<IRepository<Trainer>, TrainerEfCoreRepository>();
+builder.Services.AddSingleton<IRepository<TrainingSession>, TrainingSessionEfCoreRepository>();
+builder.Services.AddSingleton<IRepository<GymHall>, GymHallEfCoreRepository>();
+builder.Services.AddSingleton<IRepository<Specialization>, SpecializationEfCoreRepository>();
 
 builder.Services.AddSingleton<IClientService, ClientService>();
 builder.Services.AddSingleton<ITrainerService, TrainerService>();
