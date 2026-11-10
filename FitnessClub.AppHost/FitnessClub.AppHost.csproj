@@ -1,0 +1,22 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AspireUseCliBundle>true</AspireUseCliBundle>
+        <UserSecretsId>220e9dcd-0e1f-4c01-97ad-1a70e0af601a</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FitnessClub.Application\FitnessClub.Application.csproj" />
+      <ProjectReference Include="..\FitnessClub.Contracts\FitnessClub.Contracts.csproj" />
+      <ProjectReference Include="..\FitnessClub.Domain\FitnessClub.Domain.csproj" />
+      <ProjectReference Include="..\FitnessClub.Infrastructure.EfCore\FitnessClub.Infrastructure.EfCore.csproj" />
+      <ProjectReference Include="..\FitnessClub.Infrastructure.InMemory\FitnessClub.Infrastructure.InMemory.csproj" />
+      <ProjectReference Include="..\FitnessClub.Server\FitnessClub.Server.csproj" />
+      <ProjectReference Include="..\FitnessClub.Tests\FitnessClub.Tests.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -22,6 +22,7 @@
         <ProjectReference Include="..\FitnessClub.Contracts\FitnessClub.Contracts.csproj" />
         <ProjectReference Include="..\FitnessClub.Domain\FitnessClub.Domain.csproj" />
         <ProjectReference Include="..\FitnessClub.Infrastructure.EfCore\FitnessClub.Infrastructure.EfCore.csproj" />
+        <ProjectReference Include="..\FitnessClub.ServiceDefaults\FitnessClub.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>
