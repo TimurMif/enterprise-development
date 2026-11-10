@@ -5,14 +5,35 @@ namespace FitnessClub.Infrastructure.EfCore;
 using Microsoft.EntityFrameworkCore;
 using FitnessClub.Domain.Models;
 
+/// <summary>
+/// Контекст данных фитнес-клуба для Entity Framework Core
+/// </summary>
 public class FitnessClubDbContext(DbContextOptions options) : DbContext(options)
 {
+    /// <summary>
+    /// Таблица клиентов
+    /// </summary>
     public DbSet<Client> Clients { get; set; }
+    /// <summary>
+    /// Таблица тренеров
+    /// </summary>
     public DbSet<Trainer> Trainers { get; set; }
+    /// <summary>
+    /// Таблица спортивных залов
+    /// </summary>
     public DbSet<GymHall> GymHalls { get; set; }
+    /// <summary>
+    /// Таблица специализаций
+    /// </summary>
     public DbSet<Specialization> Specializations { get; set; }
+    /// <summary>
+    /// Таблица тренировок
+    /// </summary>
     public DbSet<TrainingSession> TrainingSessions { get; set; }
 
+    /// <summary>
+    /// Настраивает связи между сущностями и заполняет базу начальными данными
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         var data = DataSeeder.Seed();
