@@ -16,18 +16,18 @@ builder.Services.AddOpenApi();
 
 //builder.Services.AddSingleton(sp => DataSeeder.Seed());
 
-builder.Services.AddSingleton<IRepository<Client>, ClientEfCoreRepository>();
-builder.Services.AddSingleton<IRepository<Trainer>, TrainerEfCoreRepository>();
-builder.Services.AddSingleton<IRepository<TrainingSession>, TrainingSessionEfCoreRepository>();
-builder.Services.AddSingleton<IRepository<GymHall>, GymHallEfCoreRepository>();
-builder.Services.AddSingleton<IRepository<Specialization>, SpecializationEfCoreRepository>();
+builder.Services.AddScoped<IRepository<Client>, ClientEfCoreRepository>();
+builder.Services.AddScoped<IRepository<Trainer>, TrainerEfCoreRepository>();
+builder.Services.AddScoped<IRepository<TrainingSession>, TrainingSessionEfCoreRepository>();
+builder.Services.AddScoped<IRepository<GymHall>, GymHallEfCoreRepository>();
+builder.Services.AddScoped<IRepository<Specialization>, SpecializationEfCoreRepository>();
 
-builder.Services.AddSingleton<IClientService, ClientService>();
-builder.Services.AddSingleton<ITrainerService, TrainerService>();
-builder.Services.AddSingleton<ITrainingSessionService, TrainingSessionService>();
-builder.Services.AddSingleton<IGymHallService, GymHallService>();
-builder.Services.AddSingleton<ISpecializationService, SpecializationService>();
-builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<ITrainerService, TrainerService>();
+builder.Services.AddScoped<ITrainingSessionService, TrainingSessionService>();
+builder.Services.AddScoped<IGymHallService, GymHallService>();
+builder.Services.AddScoped<ISpecializationService, SpecializationService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 var app = builder.Build();
 
