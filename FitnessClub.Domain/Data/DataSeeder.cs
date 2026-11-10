@@ -170,46 +170,46 @@ public static class DataSeeder
         var data = new (int Hall, int Trainer, int Client, DateTime When, bool IsTrial)[]
         {
             // Зал 1 (Йога)
-            (1, 10, 1,  new(2025, 6, 5, 10, 0, 0),  false),
-            (1, 10, 2,  new(2025, 6, 10, 10, 0, 0), true),
-            (1, 9,  3,  new(2025, 6, 12, 15, 0, 0), false),
-            (1, 10, 4,  new(2025, 6, 20, 10, 0, 0), false),
+            (1, 10, 1,  new(2025, 6, 5, 10, 0, 0, DateTimeKind.Utc),  false),
+            (1, 10, 2,  new(2025, 6, 10, 10, 0, 0, DateTimeKind.Utc), true),
+            (1, 9,  3,  new(2025, 6, 12, 15, 0, 0, DateTimeKind.Utc), false),
+            (1, 10, 4,  new(2025, 6, 20, 10, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 2 (Кроссфит)
-            (2, 10, 5,  new(2025, 6, 6, 11, 0, 0),  false),
-            (2, 9,  6,  new(2025, 6, 8, 12, 0, 0),  false),
-            (2, 9,  7,  new(2025, 6, 11, 14, 0, 0), true),
+            (2, 10, 5,  new(2025, 6, 6, 11, 0, 0, DateTimeKind.Utc),  false),
+            (2, 9,  6,  new(2025, 6, 8, 12, 0, 0, DateTimeKind.Utc),  false),
+            (2, 9,  7,  new(2025, 6, 11, 14, 0, 0, DateTimeKind.Utc), true),
 
             // Зал 3 (Кардио)
-            (3, 9,  8,  new(2025, 6, 13, 9, 0, 0),  false),
-            (3, 8,  9,  new(2025, 6, 14, 16, 0, 0), false),
-            (3, 8,  10, new(2025, 6, 18, 11, 0, 0), false),
+            (3, 9,  8,  new(2025, 6, 13, 9, 0, 0, DateTimeKind.Utc),  false),
+            (3, 8,  9,  new(2025, 6, 14, 16, 0, 0, DateTimeKind.Utc), false),
+            (3, 8,  10, new(2025, 6, 18, 11, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 4 (Силовой)
-            (4, 8,  11, new(2025, 6, 7, 13, 0, 0),  false),
-            (4, 8,  12, new(2025, 6, 19, 10, 0, 0), false),
+            (4, 8,  11, new(2025, 6, 7, 13, 0, 0, DateTimeKind.Utc),  false),
+            (4, 8,  12, new(2025, 6, 19, 10, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 5 (Единоборства)
-            (5, 7,  13, new(2025, 6, 9, 15, 0, 0),  false),
-            (5, 7,  14, new(2025, 6, 16, 10, 0, 0), true),
-            (5, 7,  15, new(2025, 6, 22, 11, 0, 0), false),
+            (5, 7,  13, new(2025, 6, 9, 15, 0, 0, DateTimeKind.Utc),  false),
+            (5, 7,  14, new(2025, 6, 16, 10, 0, 0, DateTimeKind.Utc), true),
+            (5, 7,  15, new(2025, 6, 22, 11, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 6 (Пилатес)
-            (6, 6,  1,  new(2025, 6, 3, 9, 0, 0),   false),
-            (6, 6,  2,  new(2025, 6, 25, 10, 0, 0), false),
+            (6, 6,  1,  new(2025, 6, 3, 9, 0, 0, DateTimeKind.Utc),   false),
+            (6, 6,  2,  new(2025, 6, 25, 10, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 7 (Аэробика)
-            (7, 5,  3,  new(2025, 6, 4, 14, 0, 0),  false),
-            (7, 9,  4,  new(2025, 5, 25, 10, 0, 0), false),
+            (7, 5,  3,  new(2025, 6, 4, 14, 0, 0, DateTimeKind.Utc),  false),
+            (7, 9,  4,  new(2025, 5, 25, 10, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 8 (Стретчинг)
-            (8, 4,  5,  new(2025, 6, 15, 18, 0, 0), false),
+            (8, 4,  5,  new(2025, 6, 15, 18, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 9 (Реабилитация)
-            (9, 10, 6,  new(2025, 6, 28, 10, 0, 0), false),
+            (9, 10, 6,  new(2025, 6, 28, 10, 0, 0, DateTimeKind.Utc), false),
 
             // Зал 10 (Универсальный)
-            (10, 10, 7, new(2025, 7, 2, 10, 0, 0),  false)
+            (10, 10, 7, new(2025, 7, 2, 10, 0, 0, DateTimeKind.Utc),  false)
         };
 
         for (var i = 0; i < data.Length; i++)

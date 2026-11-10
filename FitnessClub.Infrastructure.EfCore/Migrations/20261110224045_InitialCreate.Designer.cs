@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitnessClub.Infrastructure.EfCore.Migrations
 {
     [DbContext(typeof(FitnessClubDbContext))]
-    [Migration("20261110204350_InitialCreate")]
+    [Migration("20261110224045_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -668,7 +668,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 1,
                             ClientId = 1,
-                            DateTime = new DateTime(2025, 6, 5, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 5, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 1,
                             IsTrial = false,
@@ -678,7 +678,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 2,
                             ClientId = 2,
-                            DateTime = new DateTime(2025, 6, 10, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 10, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 1,
                             IsTrial = true,
@@ -688,7 +688,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 3,
                             ClientId = 3,
-                            DateTime = new DateTime(2025, 6, 12, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 12, 15, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 1,
                             IsTrial = false,
@@ -698,7 +698,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 4,
                             ClientId = 4,
-                            DateTime = new DateTime(2025, 6, 20, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 20, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 1,
                             IsTrial = false,
@@ -708,7 +708,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 5,
                             ClientId = 5,
-                            DateTime = new DateTime(2025, 6, 6, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 6, 11, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 2,
                             IsTrial = false,
@@ -718,7 +718,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 6,
                             ClientId = 6,
-                            DateTime = new DateTime(2025, 6, 8, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 8, 12, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 2,
                             IsTrial = false,
@@ -728,7 +728,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 7,
                             ClientId = 7,
-                            DateTime = new DateTime(2025, 6, 11, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 11, 14, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 2,
                             IsTrial = true,
@@ -738,7 +738,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 8,
                             ClientId = 8,
-                            DateTime = new DateTime(2025, 6, 13, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 13, 9, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 3,
                             IsTrial = false,
@@ -748,7 +748,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 9,
                             ClientId = 9,
-                            DateTime = new DateTime(2025, 6, 14, 16, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 14, 16, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 3,
                             IsTrial = false,
@@ -758,7 +758,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 10,
                             ClientId = 10,
-                            DateTime = new DateTime(2025, 6, 18, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 18, 11, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 3,
                             IsTrial = false,
@@ -768,7 +768,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 11,
                             ClientId = 11,
-                            DateTime = new DateTime(2025, 6, 7, 13, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 7, 13, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 4,
                             IsTrial = false,
@@ -778,7 +778,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 12,
                             ClientId = 12,
-                            DateTime = new DateTime(2025, 6, 19, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 19, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 4,
                             IsTrial = false,
@@ -788,7 +788,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 13,
                             ClientId = 13,
-                            DateTime = new DateTime(2025, 6, 9, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 9, 15, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 5,
                             IsTrial = false,
@@ -798,7 +798,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 14,
                             ClientId = 14,
-                            DateTime = new DateTime(2025, 6, 16, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 16, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 5,
                             IsTrial = true,
@@ -808,7 +808,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 15,
                             ClientId = 15,
-                            DateTime = new DateTime(2025, 6, 22, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 22, 11, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 5,
                             IsTrial = false,
@@ -818,7 +818,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 16,
                             ClientId = 1,
-                            DateTime = new DateTime(2025, 6, 3, 9, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 3, 9, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 6,
                             IsTrial = false,
@@ -828,7 +828,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 17,
                             ClientId = 2,
-                            DateTime = new DateTime(2025, 6, 25, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 25, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 6,
                             IsTrial = false,
@@ -838,7 +838,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 18,
                             ClientId = 3,
-                            DateTime = new DateTime(2025, 6, 4, 14, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 4, 14, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 7,
                             IsTrial = false,
@@ -848,7 +848,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 19,
                             ClientId = 4,
-                            DateTime = new DateTime(2025, 5, 25, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 5, 25, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 7,
                             IsTrial = false,
@@ -858,7 +858,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 20,
                             ClientId = 5,
-                            DateTime = new DateTime(2025, 6, 15, 18, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 15, 18, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 8,
                             IsTrial = false,
@@ -868,7 +868,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 21,
                             ClientId = 6,
-                            DateTime = new DateTime(2025, 6, 28, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 6, 28, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 9,
                             IsTrial = false,
@@ -878,7 +878,7 @@ namespace FitnessClub.Infrastructure.EfCore.Migrations
                         {
                             Id = 22,
                             ClientId = 7,
-                            DateTime = new DateTime(2025, 7, 2, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateTime = new DateTime(2025, 7, 2, 10, 0, 0, 0, DateTimeKind.Utc),
                             Duration = new TimeSpan(0, 1, 0, 0, 0),
                             GymHallId = 10,
                             IsTrial = false,

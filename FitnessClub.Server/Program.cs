@@ -4,6 +4,7 @@ using FitnessClub.Domain.Interfaces;
 using FitnessClub.Domain.Models;
 using FitnessClub.Infrastructure.EfCore;
 using FitnessClub.Infrastructure.EfCore.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +15,6 @@ builder.AddNpgsqlDbContext<FitnessClubDbContext>("Postgres");
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
-//builder.Services.AddSingleton(sp => DataSeeder.Seed());
 
 builder.Services.AddScoped<IRepository<Client>, ClientEfCoreRepository>();
 builder.Services.AddScoped<IRepository<Trainer>, TrainerEfCoreRepository>();
@@ -38,6 +37,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<FitnessClubDbContext>();
+    context.Database.Migrate();
 }
 
 app.MapControllers();
