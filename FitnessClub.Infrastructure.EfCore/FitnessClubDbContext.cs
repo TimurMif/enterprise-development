@@ -41,6 +41,18 @@ public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options
     {
         var data = DataSeeder.Seed();
         
+        foreach (var trainer in data.Trainers)
+        {
+            trainer.Specialization = null;
+        }
+
+        foreach (var session in data.TrainingSessions)
+        {
+            session.Client = null;
+            session.Trainer = null;
+            session.GymHall = null;
+        }
+        
         modelBuilder.Entity<Client>(builder =>
         {
             builder.HasKey(c => c.Id);
