@@ -36,7 +36,7 @@ public class ClientEfCoreRepository(FitnessClubDbContext context) : IRepository<
     {
         var existing = await context.Clients.FirstOrDefaultAsync(c => c.Id == entity.Id);
         if (existing == null) return false;
-        context.Clients.Update(entity);
+        context.Entry(existing).CurrentValues.SetValues(entity);
         await context.SaveChangesAsync();
         return true;
     }

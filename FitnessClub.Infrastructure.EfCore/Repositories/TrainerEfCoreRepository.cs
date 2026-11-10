@@ -12,12 +12,14 @@ public class TrainerEfCoreRepository(FitnessClubDbContext context) : IRepository
     /// <summary>
     /// Возвращает список всех тренеров
     /// </summary>
-    public async Task<List<Trainer>> GetAllAsync() => await context.Trainers.ToListAsync();
+    public async Task<List<Trainer>> GetAllAsync() => 
+        await context.Trainers.Include(t => t.Specialization).ToListAsync();
 
     /// <summary>
     /// Возвращает тренера по его Id
     /// </summary>
-    public async Task<Trainer?> GetByIdAsync(int id) => await context.Trainers.FirstOrDefaultAsync(t => t.Id == id);
+    public async Task<Trainer?> GetByIdAsync(int id) => 
+        await context.Trainers.Include(t => t.Specialization).FirstOrDefaultAsync(t => t.Id == id);
 
     /// <summary>
     /// Добавляет нового тренера в базу данных
@@ -36,7 +38,8 @@ public class TrainerEfCoreRepository(FitnessClubDbContext context) : IRepository
     {
         var existing = await context.Trainers.FirstOrDefaultAsync(t => t.Id == entity.Id);
         if (existing == null) return false;
-        context.Trainers.Update(entity);
+        context.Entry(existing).CurrentValues.SetValues(entity);
+        existing.Specialization = entity.Specialization;
         await context.SaveChangesAsync();
         return true;
     }

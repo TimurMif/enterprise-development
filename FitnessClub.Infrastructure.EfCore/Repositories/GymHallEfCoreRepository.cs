@@ -36,7 +36,7 @@ public class GymHallEfCoreRepository(FitnessClubDbContext context) : IRepository
     {
         var existing = await context.GymHalls.FirstOrDefaultAsync(g => g.Id == entity.Id);
         if (existing == null) return false;
-        context.GymHalls.Update(entity);
+        context.Entry(existing).CurrentValues.SetValues(entity);
         await context.SaveChangesAsync();
         return true;
     }

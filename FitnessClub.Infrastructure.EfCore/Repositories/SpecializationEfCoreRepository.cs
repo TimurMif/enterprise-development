@@ -36,7 +36,7 @@ public class SpecializationEfCoreRepository(FitnessClubDbContext context) : IRep
     {
         var existing = await context.Specializations.FirstOrDefaultAsync(s => s.Id == entity.Id);
         if (existing == null) return false;
-        context.Specializations.Update(entity);
+        context.Entry(existing).CurrentValues.SetValues(entity);
         await context.SaveChangesAsync();
         return true;
     }

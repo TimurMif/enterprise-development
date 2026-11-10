@@ -12,12 +12,24 @@ public class TrainingSessionEfCoreRepository(FitnessClubDbContext context) : IRe
     /// <summary>
     /// Возвращает список всех тренировок
     /// </summary>
-    public async Task<List<TrainingSession>> GetAllAsync() => await context.TrainingSessions.ToListAsync();
+    public async Task<List<TrainingSession>> GetAllAsync() => 
+        await context.TrainingSessions
+            .Include(ts => ts.Client)
+            .Include(ts => ts.GymHall)
+            .Include(ts => ts.Trainer)
+                .ThenInclude(t => t!.Specialization)
+            .ToListAsync();
     
     /// <summary>
     /// Возвращает тренировку по ее Id
     /// </summary>
-    public async Task<TrainingSession?> GetByIdAsync(int id) => await context.TrainingSessions.FirstOrDefaultAsync(ts => ts.Id == id);
+    public async Task<TrainingSession?> GetByIdAsync(int id) => 
+        await context.TrainingSessions
+            .Include(ts => ts.Client)
+            .Include(ts => ts.GymHall)
+            .Include(ts => ts.Trainer)
+                .ThenInclude(t => t!.Specialization)
+            .FirstOrDefaultAsync(ts => ts.Id == id);
 
     /// <summary>
     /// Добавляет новую тренировку в базу данных
@@ -36,7 +48,10 @@ public class TrainingSessionEfCoreRepository(FitnessClubDbContext context) : IRe
     {
         var existing = await context.TrainingSessions.FirstOrDefaultAsync(ts => ts.Id == entity.Id);
         if (existing == null) return false;
-        context.TrainingSessions.Update(entity);
+        context.Entry(existing).CurrentValues.SetValues(entity);
+        existing.Client = entity.Client;
+        existing.Trainer = entity.Trainer;
+        existing.GymHall = entity.GymHall;
         await context.SaveChangesAsync();
         return true;
     }

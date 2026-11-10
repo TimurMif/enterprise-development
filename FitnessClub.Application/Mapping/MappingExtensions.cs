@@ -170,7 +170,12 @@ public static class MappingExtensions
             Trainer = trainer,
             GymHallId = gymHall.Id,
             GymHall = gymHall,
-            DateTime = dto.DateTime,
+            DateTime = dto.DateTime.Kind switch
+            {
+                DateTimeKind.Local => dto.DateTime.ToUniversalTime(),
+                DateTimeKind.Utc => dto.DateTime,
+                _ => DateTime.SpecifyKind(dto.DateTime, DateTimeKind.Utc)
+            },
             Duration = dto.Duration,
             IsTrial = dto.IsTrial
         };
