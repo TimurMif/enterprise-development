@@ -13,18 +13,22 @@ public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options
     /// Таблица клиентов
     /// </summary>
     public DbSet<Client> Clients { get; set; }
+    
     /// <summary>
     /// Таблица тренеров
     /// </summary>
     public DbSet<Trainer> Trainers { get; set; }
+    
     /// <summary>
     /// Таблица спортивных залов
     /// </summary>
     public DbSet<GymHall> GymHalls { get; set; }
+    
     /// <summary>
     /// Таблица специализаций
     /// </summary>
     public DbSet<Specialization> Specializations { get; set; }
+    
     /// <summary>
     /// Таблица тренировок
     /// </summary>
