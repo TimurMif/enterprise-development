@@ -13,7 +13,7 @@ public class Trainer : Person
     /// <summary>
     /// Навигационное свойство специализации
     /// </summary>
-    public required Specialization Specialization { get; set; }
+    public Specialization? Specialization { get; set; }
 
     /// <summary>
     /// Стаж работы

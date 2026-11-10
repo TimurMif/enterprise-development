@@ -18,7 +18,7 @@ public class TrainingSession
     /// <summary>
     /// Навигационное свойство клиента
     /// </summary>
-    public required Client Client { get; set; }
+    public Client? Client { get; set; }
 
     /// <summary>
     /// Идентификатор проводящего занятие тренера
@@ -28,7 +28,7 @@ public class TrainingSession
     /// <summary>
     /// Навигационное свойство тренера
     /// </summary>
-    public required Trainer Trainer { get; set; }
+    public Trainer? Trainer { get; set; }
 
     /// <summary>
     /// Идентификатор зала, в котором проходит занятие
@@ -38,7 +38,7 @@ public class TrainingSession
     /// <summary>
     /// Навигационное свойство спортивного зала
     /// </summary>
-    public required GymHall GymHall { get; set; }
+    public GymHall? GymHall { get; set; }
 
     /// <summary>
     /// Дата и время проведения занятия
