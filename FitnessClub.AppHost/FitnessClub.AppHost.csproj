@@ -10,13 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FitnessClub.Application\FitnessClub.Application.csproj" />
-      <ProjectReference Include="..\FitnessClub.Contracts\FitnessClub.Contracts.csproj" />
-      <ProjectReference Include="..\FitnessClub.Domain\FitnessClub.Domain.csproj" />
-      <ProjectReference Include="..\FitnessClub.Infrastructure.EfCore\FitnessClub.Infrastructure.EfCore.csproj" />
-      <ProjectReference Include="..\FitnessClub.Infrastructure.InMemory\FitnessClub.Infrastructure.InMemory.csproj" />
       <ProjectReference Include="..\FitnessClub.Server\FitnessClub.Server.csproj" />
-      <ProjectReference Include="..\FitnessClub.Tests\FitnessClub.Tests.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.5" />
     </ItemGroup>
 
 </Project>

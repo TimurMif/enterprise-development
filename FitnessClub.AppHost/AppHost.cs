@@ -1,17 +1,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.FitnessClub_Application>("fitnessclub-application");
+const string dataBaseName = "FitnessClub";
+var password = builder.AddParameter("PostgresPassword", true);
 
-builder.AddProject<Projects.FitnessClub_Contracts>("fitnessclub-contracts");
+var fitnessClubDb = builder.AddPostgres("postgres", password).AddDatabase(dataBaseName);
 
-builder.AddProject<Projects.FitnessClub_Domain>("fitnessclub-domain");
-
-builder.AddProject<Projects.FitnessClub_Infrastructure_EfCore>("fitnessclub-infrastructure-efcore");
-
-builder.AddProject<Projects.FitnessClub_Infrastructure_InMemory>("fitnessclub-infrastructure-inmemory");
-
-builder.AddProject<Projects.FitnessClub_Server>("fitnessclub-server");
-
-builder.AddProject<Projects.FitnessClub_Tests>("fitnessclub-tests");
-
+builder.AddProject<Projects.FitnessClub_Server>("FitnessClubApi")
+    .WithReference(fitnessClubDb, "Postgres")
+    .WaitFor(fitnessClubDb);
+    
 builder.Build().Run();
