@@ -1,14 +1,13 @@
 using FitnessClub.Domain.Data;
-
-namespace FitnessClub.Infrastructure.EfCore;
-
 using Microsoft.EntityFrameworkCore;
 using FitnessClub.Domain.Models;
+
+namespace FitnessClub.Infrastructure.EfCore;
 
 /// <summary>
 /// Контекст данных фитнес-клуба для Entity Framework Core
 /// </summary>
-public class FitnessClubDbContext(DbContextOptions options) : DbContext(options)
+public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options) : DbContext(options)
 {
     /// <summary>
     /// Таблица клиентов
