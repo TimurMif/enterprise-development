@@ -1,91 +1,108 @@
-# Разработка корпоративных приложений — лабораторная работа №2
+# Разработка корпоративных приложений — лабораторная работа №3
 
-В рамках второй лабораторной работы реализован REST API сервер для управления объектами фитнес-клуба. Серверная часть построена с использованием ASP.NET Core и разделена на слой контроллеров и сервисов. Доменная модель переиспользуется из первой лабораторной работы.
+## Тема: Реализация объектно-реляционной модели. Подключение к базе данных и настройка оркестрации
 
-Вариант: **14**
+В рамках третьей лабораторной работы выполнено переосмысление архитектуры приложения с переходом от хранения данных в памяти (In-Memory) к полноценной базе данных PostgreSQL с использованием Entity Framework Core. Реализована оркестрация проектов с помощью .NET Aspire для автоматического развёртывания сервера и базы данных.
 
----
-
-## Архитектура проекта
-
-Реализована многослойная архитектура, обеспечивающая связность компонентов:
-
-1. **`FitnessClub.Domain`** — содержит основные сущности бизнес-логики, перечисления, интерфейсы репозиториев, контекст данных в памяти и генератор начальных данных.
-2. **`FitnessClub.Contracts`** — содержит DTO-модели, разделенные на Read-модели и Edit-модели с атрибутами валидации, а также интерфейсы сервисов.
-3. **`FitnessClub.Application`** — реализует сервисы, содержащие всю логику приложения, маппинг данных и асинхронные операции.
-4. **`FitnessClub.Infrastructure.InMemory`** — реализует паттерн для работы с данными в оперативной памяти в качестве подготовки к будущей интеграции с Entity Framework Core.
-5. **`FitnessClub.Server`** — контроллеры, обрабатывающие входящие HTTP-запросы, выполняющие логирование и возвращающие стандартизированные ответы.
----
-
-## Внедрение зависимостей
-
-В конфигурации приложения (`Program.cs`) реализован механизм внедрения зависимостей.
-Для сохранения состояния данных между HTTP-запросами в оперативной памяти `FitnessClubContext` и все сервисы зарегистрированы с жизненным циклом Singleton:
-
-```csharp
-builder.Services.AddSingleton(sp => DataSeeder.Seed());
-
-builder.Services.AddSingleton<IRepository<Client>, ClientRepository>();
-builder.Services.AddSingleton<IRepository<Trainer>, TrainerRepository>();
-builder.Services.AddSingleton<IRepository<TrainingSession>, TrainingSessionRepository>();
-builder.Services.AddSingleton<IRepository<GymHall>, GymHallRepository>();
-builder.Services.AddSingleton<IRepository<Specialization>, SpecializationRepository>();
-
-builder.Services.AddSingleton<IClientService, ClientService>();
-builder.Services.AddSingleton<ITrainerService, TrainerService>();
-builder.Services.AddSingleton<ITrainingSessionService, TrainingSessionService>();
-builder.Services.AddSingleton<IGymHallService, GymHallService>();
-builder.Services.AddSingleton<ISpecializationService, SpecializationService>();
-builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
-```
+**Вариант:** 14
 
 ---
 
-## Описание Web API (Эндпоинты)
-| Маршрут                         | Метод   | Описание                           |
-|---------------------------------|---------|------------------------------------|
-| `/api/Clients`                  | GET     | Получить список всех клиентов      | 
-|                                 | POST    | Добавить нового клиента            |
-| `/api/Clients/{id}`             | GET     | Получить клиента по Id             |
-|                                 | PUT     | Обновить данные клиента            |
-|                                 | DELETE  | Удалить клиента                    |
-| `/api/Trainers`                 | GET     | Получить список всех тренеров      |
-|                                 | POST    | Добавить нового тренера            |
-| `/api/Trainers/{id}`            | GET     | Получить тренера по Id             |
-|                                 | PUT     | Обновить данные тренера            |
-|                                 | DELETE  | Удалить тренера                    |
-| `/api/GymHalls`                 | GET     | Получить список всех залов         |
-|                                 | POST    | Добавить новый зал                 |
-| `/api/GymHalls/{id}`            | GET     | Получить зал по Id                 |
-|                                 | PUT     | Обновить данные зала               |
-|                                 | DELETE  | Удалить зал                        |
-| `/api/Specializations`          | GET     | Получить список всех специализаций |
-|                                 | POST    | Добавить новую специализацию       |
-| `/api/Specializations/{id}`     | GET     | Получить специализацию по Id       |
-|                                 | PUT     | Обновить данные специализации      |
-|                                 | DELETE  | Удалить специализацию              |
-| `/api/TrainingSessions`         | GET     | Получить все тренировки            |
-|                                 | POST    | Создать новую тренировку           |
-| `/api/TrainingSessions/{id}`    | GET     | Получить тренировку по Id          |
-|                                 | PUT     | Обновить тренировку                |
-|                                 | DELETE  | Удалить тренировку                 |
 
-### Аналитические запросы
-| Маршрут                                  | Метод | Описание                                                                         |
-|------------------------------------------|-------|----------------------------------------------------------------------------------|
-| `/api/Analytics/experienced-trainers`    | GET   | Выводит тренеров со стажем работы от 5 лет                                       | 
-| `/api/Analytics/hall-availability`       | GET   | Проверяет, свободен ли выбранный зал                                             |
-| `/api/Analytics/expired-subscriptions`   | GET   | Клиенты с просроченным абонементом на дату                                       |
-| `/api/Analytics/sessions-by-hall-month`  | GET   | Тренировки за месяц в конкретном зале                                            |
-| `/api/Analytics/top-5-trainers`          | GET   | Топ-5 популярных тренеров по числу занятий, выводит тренеров и кол-во тренировок |
+### Ключевые изменения по сравнению с Lab 2:
+
+1. **Замена In-Memory хранилища на EF Core**  
+   Все репозитории переписаны с работы со списками в памяти на работу с `DbContext` и `DbSet<T>`.
+
+2. **Миграции базы данных**  
+   Создана начальная миграция `InitialCreate`, которая генерирует все таблицы и заполняет их тестовыми данными через `HasData()`.
+
+3. **Оркестрация через .NET Aspire**  
+   Проект `FitnessClub.AppHost` управляет запуском PostgreSQL в Docker-контейнере и веб-приложения, автоматически настраивая строки подключения.
+
+4. **ServiceDefaults**  
+   Общий проект `FitnessClub.ServiceDefaults` содержит стандартные настройки для Aspire: OpenTelemetry, health checks, service discovery.
 
 ---
 
-## Запуск проекта
-- Перейдите в директорию серверного проекта (FitnessClub.Server).
-- Запустите приложение командой:
+## Технологии
+
+| Технология                                | Назначение                       |
+|-------------------------------------------|----------------------------------|
+| **Entity Framework Core**                 | ORM для работы с БД              |
+| **Npgsql.EntityFrameworkCore.PostgreSQL** | Провайдер PostgreSQL для EF Core |
+| **.NET Aspire**                           | Оркестрация и наблюдаемость      |
+| **PostgreSQL**                            | Реляционная база данных          |
+| **Docker**                                | Контейнеризация БД               |
+
+---
+
+## База данных и миграции
+
+### Сущности базы данных
+
+База данных содержит 5 основных таблиц:
+
+1. **Specializations** — справочник специализаций тренеров
+2. **GymHalls** — спортивные залы
+3. **Clients** — клиенты фитнес-клуба
+4. **Trainers** — тренеры (связь со Specializations через FK)
+5. **TrainingSessions** — записи на тренировки (связи с Clients, Trainers, GymHalls)
+
+### Начальное заполнение данными
+
+Миграция `InitialCreate` автоматически создаёт и заполняет базу тестовыми данными:
+
+- **10 специализаций** (Силовой тренинг, Кроссфит, Пилатес, Йога, Кардио, и т.д.)
+- **10 залов** (разной вместимости от 10 до 50 человек)
+- **15 клиентов** (5 с просроченными абонементами, 10 с действующими)
+- **10 тренеров** (7 со стажем ≥5 лет, 3 < 5 лет)
+- **22 тренировочные сессии** (распределены по залам и тренерам)
+
+#### Создание миграции
+
 ```bash
-cd FitnessClub.Server
-dotnet run
+dotnet ef migrations add MigrationName --project FitnessClub.Infrastructure.EfCore --startup-project FitnessClub.Server
 ```
-<img width="1080" height="269" alt="image" src="https://github.com/user-attachments/assets/742e2359-663a-44d9-8588-cc6210361452" />
+
+---
+
+### Aspire Dashboard
+
+После запуска приложения открывается дашборд, где можно:
+
+- Просматривать статус всех ресурсов (Running, Starting, Failed)
+- Анализировать логи каждого сервиса
+- Отслеживать метрики производительности
+- Переходить к PgAdmin для работы с БД
+
+![image1.png](images/image1.png)
+---
+
+## Запуск приложения
+
+### Требования
+
+- **.NET 10 SDK**
+- **Docker Desktop** (для запуска PostgreSQL)
+- **macOS / Linux / Windows**
+
+### Пошаговый запуск
+
+1. **Перейдите в корневую директорию проекта:**
+   ```bash
+   cd ~/RiderProjects/FitnessClub
+   ```
+
+2. **Запустите проект AppHost:**
+   ```bash
+   dotnet run --project FitnessClub.AppHost
+   ```
+3. **Дождитесь запуска всех ресурсов:**
+
+5. **Просмотр базы данных:**
+    - В Aspire Dashboard кликните на ресурс **pgadmin**
+    - Раскройте: `Servers → postgres → Databases → FitnessClub → Tables`
+
+![image2.png](images/image2.png)
+---
