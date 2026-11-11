@@ -39,36 +39,22 @@ public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var data = DataSeeder.Seed();
-        
-        foreach (var trainer in data.Trainers)
-        {
-            trainer.Specialization = null;
-        }
-
-        foreach (var session in data.TrainingSessions)
-        {
-            session.Client = null;
-            session.Trainer = null;
-            session.GymHall = null;
-        }
-        
         modelBuilder.Entity<Client>(builder =>
         {
             builder.HasKey(c => c.Id);
-            builder.HasData(data.Clients);
+            builder.HasData(DataSeeder.Clients);
         });
         
         modelBuilder.Entity<GymHall>(builder =>
         {
             builder.HasKey(g => g.Id);
-            builder.HasData(data.GymHalls);
+            builder.HasData(DataSeeder.GymHalls);
         });
         
         modelBuilder.Entity<Specialization>(builder =>
         {
             builder.HasKey(s => s.Id);
-            builder.HasData(data.Specializations);
+            builder.HasData(DataSeeder.Specializations);
         });
         
         modelBuilder.Entity<Trainer>(builder =>
@@ -78,7 +64,7 @@ public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options
                 .HasForeignKey(t => t.SpecializationId)
                 .OnDelete(DeleteBehavior.Restrict);
             builder.HasKey(t => t.Id);
-            builder.HasData(data.Trainers);
+            builder.HasData(DataSeeder.Trainers);
         });
 
         modelBuilder.Entity<TrainingSession>(builder =>
@@ -96,7 +82,7 @@ public class FitnessClubDbContext(DbContextOptions<FitnessClubDbContext> options
                 .HasForeignKey(ts => ts.GymHallId)
                 .OnDelete(DeleteBehavior.Cascade);
             builder.HasKey(ts => ts.Id);
-            builder.HasData(data.TrainingSessions);
+            builder.HasData(DataSeeder.TrainingSessions);
         });
     }
 }
