@@ -1,20 +1,23 @@
-<Project Sdk="Aspire.AppHost.Sdk/17.0.0">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AspireUseCliBundle>true</AspireUseCliBundle>
         <UserSecretsId>220e9dcd-0e1f-4c01-97ad-1a70e0af601a</UserSecretsId>
+        <AspireDisableCliVersionCheck>true</AspireDisableCliVersionCheck>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FitnessClub.Server\FitnessClub.Server.csproj" />
+        <ProjectReference Include="..\FitnessClub.Server\FitnessClub.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="17.0.0" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+        <PackageReference Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="17.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.15" />
     </ItemGroup>
 
 </Project>

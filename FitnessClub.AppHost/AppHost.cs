@@ -7,7 +7,7 @@ var fitnessClubDb = builder.AddPostgres("postgres", password: passwordDb)
     .WithPgAdmin()
     .AddDatabase(dataBaseName);
 
-builder.AddProject<Projects.FitnessClub_Server>("FitnessClubApi")
+builder.AddDotnetProject("FitnessClubApi", "../FitnessClub.Server/FitnessClub.Server.csproj")
     .WithReference(fitnessClubDb, "Postgres")
     .WaitFor(fitnessClubDb);
     
