@@ -87,7 +87,7 @@ public static class MappingExtensions
             PhoneNumber = t.PhoneNumber,
             ExperienceYears = t.ExperienceYears,
             SpecializationId = t.SpecializationId,
-            Specialization = t.Specialization.ToDto()
+            Specialization = Required(t.Specialization, nameof(t.Specialization)).ToDto()
         };
     }
 
@@ -145,11 +145,11 @@ public static class MappingExtensions
         {
             Id = s.Id,
             ClientId = s.ClientId,
-            Client = s.Client.ToDto(),
+            Client = Required(s.Client, nameof(s.Client)).ToDto(),
             TrainerId = s.TrainerId,
-            Trainer = s.Trainer.ToDto(),
+            Trainer = Required(s.Trainer, nameof(s.Trainer)).ToDto(),
             GymHallId = s.GymHallId,
-            GymHall = s.GymHall.ToDto(),
+            GymHall = Required(s.GymHall, nameof(s.GymHall)).ToDto(),
             DateTime = s.DateTime,
             Duration = s.Duration,
             IsTrial = s.IsTrial
@@ -180,4 +180,11 @@ public static class MappingExtensions
             IsTrial = dto.IsTrial
         };
     }
+    
+    /// <summary>
+    /// Метод, возвращающий значение, если оно не null, в противном случае выбрасывает исключение. 
+    /// </summary>
+    private static T Required<T>(T? navigation, string name) where T : class =>
+        navigation ?? throw new InvalidOperationException(
+            $"Навигационное свойство {name} не загружено (нужен Include в репозитории)");
 }
